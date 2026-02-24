@@ -6,10 +6,11 @@ TaskFlow tasks. The tasks interacting with MotherDuck will need a MotherDuck tok
 """
 
 import cdsapi
+import zipfile
 import os
-import netCDF4 as nc
 import pandas as pd
 import duckdb
+import xarray as xr
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from datetime import datetime
@@ -19,6 +20,8 @@ from datetime import datetime
 #LOCAL_DUCKDB_STORAGE_PATH = "include/dataset/Online_Retail.duckdb"
 #MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
 CDSAPI_KEY = os.getenv("CDSAPI_KEY")
+extract_dir = 'include/dataset'
+os.makedirs(extract_dir, exist_ok=True)
 
 @dag(start_date=datetime(2026, 1, 1),
      schedule=None, 
@@ -32,6 +35,10 @@ def era5_in_taskflow():
     @task
     def retrieve_database():
         "Retrieve ERA5 data and store it in a local file"
+
+        target = 'include/dataset/Djibouti_era5.zip'
+        client = cdsapi.Client("https://cds.climate.copernicus.eu/api",CDSAPI_KEY)
+ 
         dataset = "reanalysis-era5-single-levels-monthly-means"
         request = {
               "product_type": ["monthly_averaged_reanalysis"],
@@ -46,7 +53,6 @@ def era5_in_taskflow():
             "runoff",
             "soil_temperature_level_1",
             "volumetric_soil_water_layer_1",
-            "volumetric_soil_water_layer_2"
              ],
             "year": ["2025", "2026"],
             "month": [
@@ -57,15 +63,32 @@ def era5_in_taskflow():
             ],
             "time": ["00:00"],
             "data_format": "netcdf",
-            "download_format": "unarchived",
+            "download_format": "zip",
              "area": [12.7, 41.7, 10.9, 43.5]
             }
-        target = 'Djibouti_era5.netcdf'
-        client = cdsapi.Client("https://cds.climate.copernicus.eu/api",CDSAPI_KEY)
-        df=nc.Dataset(client.retrieve(dataset, request,target))
-        client.close()
-        print(f"DataFrame created : {df.shape[0]} rows, {df.shape[1]} columns")
+        # Download
+        client.retrieve(dataset, request, target)
+        # Unzip
+        with zipfile.ZipFile(target) as z:
+            z.extractall(extract_dir)
+        # Clean up zip
+        os.remove(target)
+         # Convert all .nc files to dataframes
+        nc_files = [f for f in os.listdir(extract_dir) if f.endswith('.nc')]
+        #dataframes = {}
+        for nc_file in nc_files:
+           ds = xr.open_dataset(os.path.join(extract_dir, nc_file))
+           df = ds.to_dataframe().reset_index()
+           name = nc_file.replace('.nc', '')
+           #dataframes[name] = df
+           print(f"{name}: {df.shape[0]} rows, {list(df.columns)}")
+        # Delete all .nc files
+        for nc_file in nc_files:
+           os.remove(os.path.join(extract_dir, nc_file))
 
+
+
+    
 
     retrieve_database()
 

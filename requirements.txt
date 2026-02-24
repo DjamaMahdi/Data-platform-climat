@@ -4,4 +4,4 @@ astronomer-cosmos[dbt-duckdb]==1.10.1
 dbt-duckdb==1.9.3
 duckdb==1.4.4
 cdsapi>=0.7.7
-netCDF4
+xarray[complete]==2026.2.0
