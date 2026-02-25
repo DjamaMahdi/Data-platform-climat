@@ -15,10 +15,7 @@ from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from datetime import datetime
 
-#CSV_PATH = "include/dataset/Online_Retail.csv"
-#CSV_PATH2 = "include/dataset/Country.csv"
-#LOCAL_DUCKDB_STORAGE_PATH = "include/dataset/Online_Retail.duckdb"
-#MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
+MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
 CDSAPI_KEY = os.getenv("CDSAPI_KEY")
 extract_dir = 'include/dataset'
 os.makedirs(extract_dir, exist_ok=True)
@@ -75,22 +72,35 @@ def era5_in_taskflow():
         os.remove(target)
          # Convert all .nc files to dataframes
         nc_files = [f for f in os.listdir(extract_dir) if f.endswith('.nc')]
-        #dataframes = {}
-        for nc_file in nc_files:
+
+        for i, nc_file in enumerate(nc_files, start=1):
            ds = xr.open_dataset(os.path.join(extract_dir, nc_file))
            df = ds.to_dataframe().reset_index()
-           name = nc_file.replace('.nc', '')
-           #dataframes[name] = df
-           print(f"{name}: {df.shape[0]} rows, {list(df.columns)}")
-        # Delete all .nc files
-        for nc_file in nc_files:
+           csv_path = os.path.join(extract_dir, f"Table{i}.csv")
+           df.to_csv(csv_path, index=False)
+           print(f"Table{i}: {df.shape[0]} rows")
            os.remove(os.path.join(extract_dir, nc_file))
+           
+    @task
+    def ingest_motherduck_database():
+        "Ingest data in a MotherDuck database to store the ERA5 data in it"
+        # Connect to MotherDuck (this will create a new database file if it doesn't exist)
+        conn = duckdb.connect("md:Climate_Era5", config={"motherduck_token" : MOTHERDUCK_TOKEN})
+        csv_files = [f for f in os.listdir(extract_dir) if f.endswith('.csv')]
+        for csv_file in csv_files:
+           name = csv_file.replace('.csv', '')
+           filepath = os.path.join(extract_dir, csv_file)
+           print(f"Copying {name}...")
+           conn.sql(f"""
+            CREATE OR REPLACE TABLE Climate_Era5.Bronze.{name}
+            AS SELECT * FROM read_csv_auto('{filepath}')
+            """)
 
-
-
+        conn.close()
     
 
-    retrieve_database()
+    chain(retrieve_database(), 
+          ingest_motherduck_database())
 
 
 era5_in_taskflow()

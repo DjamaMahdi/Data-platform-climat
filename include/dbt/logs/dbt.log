@@ -1,0 +1,589 @@
+[0m10:25:51.623672 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f72a29fa0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f7330e330>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f731c2e40>]}
+
+
+============================== 10:25:51.628027 | ccea260a-4d7a-42dc-b18b-2b9f8193cfcf ==============================
+[0m10:25:51.628027 [info ] [MainThread]: Running with dbt=1.11.6
+[0m10:25:51.630199 [debug] [MainThread]: running dbt with arguments {'log_path': '/usr/local/airflow/include/dbt/logs', 'log_format': 'default', 'version_check': 'True', 'send_anonymous_usage_stats': 'True', 'introspect': 'True', 'indirect_selection': 'eager', 'static_parser': 'True', 'partial_parse': 'True', 'no_print': 'None', 'quiet': 'False', 'cache_selected_only': 'False', 'write_json': 'True', 'fail_fast': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_cache_events': 'False', 'debug': 'False', 'empty': 'None', 'invocation_command': 'dbt deps', 'use_colors': 'True', 'profiles_dir': '/usr/local/airflow/include/dbt', 'use_experimental_parser': 'False', 'target_path': 'None', 'printer_width': '80', 'warn_error': 'None'}
+[0m10:25:51.637891 [warn ] [MainThread]: [[33mWARNING[0m][MissingPlusPrefixDeprecation]: Deprecated functionality
+Missing '+' prefix on `pool` found at `duckdb.meta.cosmos.operator_kwargs.pool`
+in file `/usr/local/airflow/include/dbt/dbt_project.yml`. Hierarchical config
+values without a '+' prefix are deprecated in dbt_project.yml.
+[0m10:25:51.638758 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'deprecation', 'label': 'ccea260a-4d7a-42dc-b18b-2b9f8193cfcf', 'property_': 'warn', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f7299d550>]}
+[0m10:25:51.772151 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'ccea260a-4d7a-42dc-b18b-2b9f8193cfcf', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f7289d700>]}
+[0m10:25:51.793274 [debug] [MainThread]: Set downloads directory='/tmp/dbt-downloads-v47elehw'
+[0m10:25:51.794123 [debug] [MainThread]: Making package index registry request: GET https://hub.getdbt.com/api/v1/index.json
+[0m10:25:56.282665 [debug] [MainThread]: Response from registry index: GET https://hub.getdbt.com/api/v1/index.json 200
+[0m10:25:56.284648 [debug] [MainThread]: Making package registry request: GET https://hub.getdbt.com/api/v1/dbt-labs/dbt_utils.json
+[0m10:25:56.584806 [debug] [MainThread]: Response from registry: GET https://hub.getdbt.com/api/v1/dbt-labs/dbt_utils.json 200
+[0m10:25:56.599787 [info ] [MainThread]: Updating lock file in file path: /usr/local/airflow/include/dbt/package-lock.yml
+[0m10:25:56.627457 [debug] [MainThread]: Set downloads directory='/tmp/dbt-downloads-ma67kaw_'
+[0m10:25:56.630239 [info ] [MainThread]: Installing dbt-labs/dbt_utils
+[0m10:26:01.609978 [info ] [MainThread]: Installed from version 1.3.3
+[0m10:26:01.610588 [info ] [MainThread]: Up to date!
+[0m10:26:01.611289 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'package', 'label': 'ccea260a-4d7a-42dc-b18b-2b9f8193cfcf', 'property_': 'install', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f72668c20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f72668800>]}
+[0m10:26:01.614030 [warn ] [MainThread]: [[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MissingPlusPrefixDeprecation: 1 occurrence
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.
+[0m10:26:01.616839 [debug] [MainThread]: Resource report: {"command_name": "deps", "command_success": true, "command_wall_clock_time": 8.260238, "process_in_blocks": "904", "process_kernel_time": 1.514878, "process_mem_max_rss": "103884", "process_out_blocks": "176", "process_user_time": 1.536036}
+[0m10:26:01.617719 [debug] [MainThread]: Command `dbt deps` succeeded at 10:26:01.617630 after 8.26 seconds
+[0m10:26:01.618211 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f729f3680>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f75387e90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d6f753195e0>]}
+[0m10:26:01.618759 [debug] [MainThread]: Flushing usage events
+[0m10:26:03.520080 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:26:28.878619 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3afba78f0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3b04804a0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3af85b620>]}
+
+
+============================== 10:26:28.882512 | 259753bc-663b-47a8-aaa8-502fe9291cc0 ==============================
+[0m10:26:28.882512 [info ] [MainThread]: Running with dbt=1.11.6
+[0m10:26:28.883426 [debug] [MainThread]: running dbt with arguments {'log_format': 'default', 'profiles_dir': '/usr/local/airflow/include/dbt/', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'empty': 'False', 'invocation_command': 'dbt run --profiles-dir /usr/local/airflow/include/dbt/', 'use_colors': 'True', 'log_cache_events': 'False', 'write_json': 'True', 'cache_selected_only': 'False', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'partial_parse': 'True', 'no_print': 'None', 'log_path': '/usr/local/airflow/include/dbt/logs', 'warn_error': 'None', 'use_experimental_parser': 'False', 'debug': 'False', 'printer_width': '80', 'quiet': 'False', 'target_path': 'None', 'static_parser': 'True', 'fail_fast': 'False', 'introspect': 'True'}
+[0m10:26:29.546475 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3b2143ec0>]}
+[0m10:26:29.596682 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3aff13560>]}
+[0m10:26:29.599153 [info ] [MainThread]: Registered adapter: duckdb=1.9.0
+[0m10:26:29.680982 [debug] [MainThread]: checksum: ec27062d18352e9cfca161c166fcc73d2201661a23a3cf3c89196a27f32cfcb8, vars: {}, profile: , target: , version: 1.11.6
+[0m10:26:29.688125 [info ] [MainThread]: Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m10:26:29.688792 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3a5a79a90>]}
+[0m10:26:31.381275 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.duckdb.meta.cosmos.operator_kwargs
+[0m10:26:31.388975 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3a419b5c0>]}
+[0m10:26:31.463798 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m10:26:31.472375 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m10:26:31.499551 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3b13a5e50>]}
+[0m10:26:31.500454 [info ] [MainThread]: Found 3 models, 2 sources, 571 macros
+[0m10:26:31.501300 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '259753bc-663b-47a8-aaa8-502fe9291cc0', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3af786d80>]}
+[0m10:26:31.504371 [info ] [MainThread]: 
+[0m10:26:31.505222 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m10:26:31.506140 [info ] [MainThread]: 
+[0m10:26:31.507404 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m10:26:31.514059 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ'
+[0m10:26:31.582035 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ"
+[0m10:26:31.582736 [debug] [ThreadPool]: On list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ"} */
+
+    
+    select schema_name
+    from system.information_schema.schemata
+    
+    where lower(catalog_name) = '"climate_era5 motherduck_token=eyjhbgcioijiuzi1niisinr5cci6ikpxvcj9.eyjlbwfpbci6imrqyw1hlm1hagrplmrqyw1hqgdtywlslmnvbsisim1kumvnaw9uijoiyxdzlwv1lwnlbnryywwtmsisinnlc3npb24ioijkamftys5tywhkas5kamftys5nbwfpbc5jb20ilcjwyxqioiizemlxn3vwz1bgytboc29cvthoqnowm2hhs0fhci1jsvreu3rfczg3vlbriiwidxnlcklkijoiotbmndg0ywmtmgixos00odfjltg2mtitmti0ogi1owm5njg3iiwiaxnzijoibwrfcgf0iiwicmvhze9ubhkiomzhbhnllcj0b2tlblr5cguioijyzwfkx3dyaxrliiwiawf0ijoxnzcwntu0nju3fq"'
+    
+  
+  
+[0m10:26:31.583411 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m10:26:34.837368 [debug] [ThreadPool]: DuckDB adapter: Error running SQL: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ"} */
+
+    
+    select schema_name
+    from system.information_schema.schemata
+    
+    where lower(catalog_name) = '"climate_era5 motherduck_token=eyjhbgcioijiuzi1niisinr5cci6ikpxvcj9.eyjlbwfpbci6imrqyw1hlm1hagrplmrqyw1hqgdtywlslmnvbsisim1kumvnaw9uijoiyxdzlwv1lwnlbnryywwtmsisinnlc3npb24ioijkamftys5tywhkas5kamftys5nbwfpbc5jb20ilcjwyxqioiizemlxn3vwz1bgytboc29cvthoqnowm2hhs0fhci1jsvreu3rfczg3vlbriiwidxnlcklkijoiotbmndg0ywmtmgixos00odfjltg2mtitmti0ogi1owm5njg3iiwiaxnzijoibwrfcgf0iiwicmvhze9ubhkiomzhbhnllcj0b2tlblr5cguioijyzwfkx3dyaxrliiwiawf0ijoxnzcwntu0nju3fq"'
+    
+  
+  
+[0m10:26:34.838611 [debug] [ThreadPool]: DuckDB adapter: Rolling back transaction.
+[0m10:26:34.840230 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m10:26:34.840962 [debug] [MainThread]: Connection 'list_Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ' was properly closed.
+[0m10:26:34.841753 [info ] [MainThread]: 
+[0m10:26:34.842481 [info ] [MainThread]: Finished running  in 0 hours 0 minutes and 3.33 seconds (3.33s).
+[0m10:26:34.843641 [error] [MainThread]: Encountered an error:
+Runtime Error
+  Invalid Input Error: Initialization function "motherduck_duckdb_cpp_init" from file "/home/astro/.duckdb/extensions/v1.4.4/linux_amd64/motherduck.duckdb_extension" threw an exception: "Failed to attach 'Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ.UVxIUf4KA5In7qvl2UUnHQaix8V7ELshuXbnYOw6hpY': no database/share named 'Climate_Era5 motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRqYW1hLm1haGRpLmRqYW1hQGdtYWlsLmNvbSIsIm1kUmVnaW9uIjoiYXdzLWV1LWNlbnRyYWwtMSIsInNlc3Npb24iOiJkamFtYS5tYWhkaS5kamFtYS5nbWFpbC5jb20iLCJwYXQiOiIzemlxN3VwZ1BGYTBOc29CVThoQnowM2hhS0FHci1jSVREU3Rfczg3VlBrIiwidXNlcklkIjoiOTBmNDg0YWMtMGIxOS00ODFjLTg2MTItMTI0OGI1OWM5Njg3IiwiaXNzIjoibWRfcGF0IiwicmVhZE9ubHkiOmZhbHNlLCJ0b2tlblR5cGUiOiJyZWFkX3dyaXRlIiwiaWF0IjoxNzcwNTU0NjU3fQ.UVxIUf4KA5In7qvl2UUnHQaix8V7ELshuXbnYOw6hpY' found"
+[0m10:26:34.845529 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 6.033648, "process_in_blocks": "56", "process_kernel_time": 1.092912, "process_mem_max_rss": "184484", "process_out_blocks": "0", "process_user_time": 3.228487}
+[0m10:26:34.846190 [debug] [MainThread]: Command `dbt run` failed at 10:26:34.846102 after 6.03 seconds
+[0m10:26:34.846730 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c3b00c64b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c37ff85b20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x74c37e542c90>]}
+[0m10:26:34.847322 [debug] [MainThread]: Flushing usage events
+[0m10:26:35.511896 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:31:21.925913 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ffa86bd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ffab8dd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ff393770>]}
+
+
+============================== 10:31:21.930004 | 417ced2f-b8e4-4c02-8049-a0fb8841ea02 ==============================
+[0m10:31:21.930004 [info ] [MainThread]: Running with dbt=1.11.6
+[0m10:31:21.930779 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'use_experimental_parser': 'False', 'quiet': 'False', 'log_cache_events': 'False', 'log_format': 'default', 'invocation_command': 'dbt run --profiles-dir /usr/local/airflow/include/dbt/', 'fail_fast': 'False', 'static_parser': 'True', 'target_path': 'None', 'profiles_dir': '/usr/local/airflow/include/dbt/', 'warn_error': 'None', 'use_colors': 'True', 'version_check': 'True', 'send_anonymous_usage_stats': 'True', 'introspect': 'True', 'debug': 'False', 'printer_width': '80', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_path': '/usr/local/airflow/include/dbt/logs', 'no_print': 'None', 'cache_selected_only': 'False', 'empty': 'False', 'write_json': 'True'}
+[0m10:31:22.147876 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x753201633dd0>]}
+[0m10:31:22.196746 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ffb5c4d0>]}
+[0m10:31:22.198749 [info ] [MainThread]: Registered adapter: duckdb=1.9.0
+[0m10:31:22.281334 [debug] [MainThread]: checksum: ec27062d18352e9cfca161c166fcc73d2201661a23a3cf3c89196a27f32cfcb8, vars: {}, profile: , target: , version: 1.11.6
+[0m10:31:22.363734 [info ] [MainThread]: Unable to do partial parsing because profile has changed
+[0m10:31:22.365463 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ff3fdc40>]}
+[0m10:31:24.028697 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.duckdb.meta.cosmos.operator_kwargs
+[0m10:31:24.036491 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531f4bce000>]}
+[0m10:31:24.104732 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m10:31:24.111243 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m10:31:24.137211 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531eda6aea0>]}
+[0m10:31:24.140135 [info ] [MainThread]: Found 3 models, 2 sources, 571 macros
+[0m10:31:24.142579 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531f4bc02c0>]}
+[0m10:31:24.147319 [info ] [MainThread]: 
+[0m10:31:24.148938 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m10:31:24.150013 [info ] [MainThread]: 
+[0m10:31:24.151245 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m10:31:24.156207 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_Climate_Era5'
+[0m10:31:24.190243 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5"
+[0m10:31:24.191223 [debug] [ThreadPool]: On list_Climate_Era5: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5"} */
+
+    
+    select schema_name
+    from system.information_schema.schemata
+    
+    where lower(catalog_name) = '"climate_era5"'
+    
+  
+  
+[0m10:31:24.192167 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m10:31:30.589433 [debug] [ThreadPool]: SQL status: OK in 6.397 seconds
+[0m10:31:30.592178 [debug] [ThreadPool]: On list_Climate_Era5: Close
+[0m10:31:30.593819 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_Climate_Era5, now create_Climate_Era5_main)
+[0m10:31:30.594640 [debug] [ThreadPool]: Creating schema "database: "Climate_Era5"
+schema: "main"
+"
+[0m10:31:30.604927 [debug] [ThreadPool]: Using duckdb connection "create_Climate_Era5_main"
+[0m10:31:30.605840 [debug] [ThreadPool]: On create_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "create_Climate_Era5_main"} */
+
+    
+        select type from duckdb_databases()
+        where lower(database_name)='climate_era5'
+        and type='sqlite'
+    
+  
+[0m10:31:30.606577 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m10:31:30.608653 [debug] [ThreadPool]: SQL status: OK in 0.002 seconds
+[0m10:31:30.611544 [debug] [ThreadPool]: Using duckdb connection "create_Climate_Era5_main"
+[0m10:31:30.612546 [debug] [ThreadPool]: On create_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "create_Climate_Era5_main"} */
+
+    
+    
+        create schema if not exists "Climate_Era5"."main"
+    
+[0m10:31:30.727165 [debug] [ThreadPool]: SQL status: OK in 0.114 seconds
+[0m10:31:30.728526 [debug] [ThreadPool]: On create_Climate_Era5_main: Close
+[0m10:31:30.730855 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly create_Climate_Era5_main, now list_Climate_Era5_main)
+[0m10:31:30.735525 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_main"
+[0m10:31:30.736253 [debug] [ThreadPool]: On list_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_main"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'main'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m10:31:30.736782 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m10:31:30.746515 [debug] [ThreadPool]: SQL status: OK in 0.010 seconds
+[0m10:31:30.748481 [debug] [ThreadPool]: On list_Climate_Era5_main: Close
+[0m10:31:30.749827 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531feb82360>]}
+[0m10:31:30.750907 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:31:30.751825 [debug] [MainThread]: On master: BEGIN
+[0m10:31:30.752739 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m10:31:30.754953 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m10:31:30.756060 [debug] [MainThread]: On master: COMMIT
+[0m10:31:30.756741 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:31:30.757538 [debug] [MainThread]: On master: COMMIT
+[0m10:31:30.759279 [debug] [MainThread]: SQL status: OK in 0.001 seconds
+[0m10:31:30.760201 [debug] [MainThread]: On master: Close
+[0m10:31:30.766066 [debug] [Thread-1 (]: Began running node model.duckdb.stg_table1
+[0m10:31:30.766932 [info ] [Thread-1 (]: 1 of 2 START sql table model main.stg_table1 ................................... [RUN]
+[0m10:31:30.767707 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_Climate_Era5_main, now model.duckdb.stg_table1)
+[0m10:31:30.768363 [debug] [Thread-1 (]: Began compiling node model.duckdb.stg_table1
+[0m10:31:30.775147 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.stg_table1"
+[0m10:31:30.795832 [debug] [Thread-1 (]: Began executing node model.duckdb.stg_table1
+[0m10:31:30.818656 [debug] [Thread-1 (]: Writing runtime sql for node "model.duckdb.stg_table1"
+[0m10:31:30.845928 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table1"
+[0m10:31:30.846915 [debug] [Thread-1 (]: On model.duckdb.stg_table1: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table1"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table1__dbt_tmp"
+  
+    as (
+      SELECT 
+valid_time AS datetime_id,
+latitude,
+longitude,
+tp as total_precipitation,
+ssrd as rayonnement_solaire_surface,
+e as evaporation_reelle,
+pev as evaporation_potentielle,
+ro as ruissellement
+WHERE number=0
+FROM "Climate_Era5"."Bronze"."Table1"
+    );
+  
+  
+[0m10:31:30.847530 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m10:31:30.850071 [debug] [Thread-1 (]: DuckDB adapter: Error running SQL: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table1"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table1__dbt_tmp"
+  
+    as (
+      SELECT 
+valid_time AS datetime_id,
+latitude,
+longitude,
+tp as total_precipitation,
+ssrd as rayonnement_solaire_surface,
+e as evaporation_reelle,
+pev as evaporation_potentielle,
+ro as ruissellement
+WHERE number=0
+FROM "Climate_Era5"."Bronze"."Table1"
+    );
+  
+  
+[0m10:31:30.851122 [debug] [Thread-1 (]: DuckDB adapter: Rolling back transaction.
+[0m10:31:30.852115 [debug] [Thread-1 (]: On model.duckdb.stg_table1: Close
+[0m10:31:30.855176 [debug] [Thread-1 (]: Runtime Error in model stg_table1 (models/staging/stg_table1.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table1"
+           ^
+[0m10:31:30.857244 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ed918140>]}
+[0m10:31:30.858471 [error] [Thread-1 (]: 1 of 2 ERROR creating sql table model main.stg_table1 .......................... [[31mERROR[0m in 0.09s]
+[0m10:31:30.862362 [debug] [Thread-1 (]: Finished running node model.duckdb.stg_table1
+[0m10:31:30.863246 [debug] [Thread-1 (]: Began running node model.duckdb.stg_table2
+[0m10:31:30.863732 [debug] [Thread-4 (]: Marking all children of 'model.duckdb.stg_table1' to be skipped because of status 'error'.  Reason: Runtime Error in model stg_table1 (models/staging/stg_table1.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table1"
+           ^.
+[0m10:31:30.864212 [info ] [Thread-1 (]: 2 of 2 START sql table model main.stg_table2 ................................... [RUN]
+[0m10:31:30.865968 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.duckdb.stg_table1, now model.duckdb.stg_table2)
+[0m10:31:30.866961 [debug] [Thread-1 (]: Began compiling node model.duckdb.stg_table2
+[0m10:31:30.869606 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.stg_table2"
+[0m10:31:30.878025 [debug] [Thread-1 (]: Began executing node model.duckdb.stg_table2
+[0m10:31:30.880953 [debug] [Thread-1 (]: Writing runtime sql for node "model.duckdb.stg_table2"
+[0m10:31:30.890454 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table2"
+[0m10:31:30.891106 [debug] [Thread-1 (]: On model.duckdb.stg_table2: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table2"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table2__dbt_tmp"
+  
+    as (
+      SELECT 
+valid_time AS datetime_id,
+latitude,
+longitude,
+t2m as temperature,
+d2m as temperature_point_rosee,
+si10 as vitesse_vent,
+stl1 as temperature_sol_couche1,
+swvl1 as humidite_volumique_sol1,
+WHERE number=0
+FROM "Climate_Era5"."Bronze"."Table2"
+    );
+  
+  
+[0m10:31:30.891651 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m10:31:30.892691 [debug] [Thread-1 (]: DuckDB adapter: Error running SQL: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table2"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table2__dbt_tmp"
+  
+    as (
+      SELECT 
+valid_time AS datetime_id,
+latitude,
+longitude,
+t2m as temperature,
+d2m as temperature_point_rosee,
+si10 as vitesse_vent,
+stl1 as temperature_sol_couche1,
+swvl1 as humidite_volumique_sol1,
+WHERE number=0
+FROM "Climate_Era5"."Bronze"."Table2"
+    );
+  
+  
+[0m10:31:30.893348 [debug] [Thread-1 (]: DuckDB adapter: Rolling back transaction.
+[0m10:31:30.894094 [debug] [Thread-1 (]: On model.duckdb.stg_table2: Close
+[0m10:31:30.896458 [debug] [Thread-1 (]: Runtime Error in model stg_table2 (models/staging/stg_table2.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table2"
+           ^
+[0m10:31:30.897436 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '417ced2f-b8e4-4c02-8049-a0fb8841ea02', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ecd541a0>]}
+[0m10:31:30.898396 [error] [Thread-1 (]: 2 of 2 ERROR creating sql table model main.stg_table2 .......................... [[31mERROR[0m in 0.03s]
+[0m10:31:30.899269 [debug] [Thread-1 (]: Finished running node model.duckdb.stg_table2
+[0m10:31:30.900158 [debug] [Thread-4 (]: Marking all children of 'model.duckdb.stg_table2' to be skipped because of status 'error'.  Reason: Runtime Error in model stg_table2 (models/staging/stg_table2.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table2"
+           ^.
+[0m10:31:30.902305 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:31:30.903068 [debug] [MainThread]: On master: BEGIN
+[0m10:31:30.903631 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m10:31:30.905466 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m10:31:30.906413 [debug] [MainThread]: On master: COMMIT
+[0m10:31:30.906931 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:31:30.907477 [debug] [MainThread]: On master: COMMIT
+[0m10:31:30.908622 [debug] [MainThread]: SQL status: OK in 0.001 seconds
+[0m10:31:30.909189 [debug] [MainThread]: On master: Close
+[0m10:31:30.909833 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m10:31:30.910285 [debug] [MainThread]: Connection 'model.duckdb.stg_table2' was properly closed.
+[0m10:31:30.910783 [info ] [MainThread]: 
+[0m10:31:30.911343 [info ] [MainThread]: Finished running 2 table models in 0 hours 0 minutes and 6.76 seconds (6.76s).
+[0m10:31:30.912600 [debug] [MainThread]: Command end result
+[0m10:31:30.947945 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m10:31:30.953712 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m10:31:30.965480 [debug] [MainThread]: Wrote artifact RunExecutionResult to /usr/local/airflow/include/dbt/target/run_results.json
+[0m10:31:30.966208 [info ] [MainThread]: 
+[0m10:31:30.967024 [info ] [MainThread]: [31mCompleted with 2 errors, 0 partial successes, and 0 warnings:[0m
+[0m10:31:30.967838 [info ] [MainThread]: 
+[0m10:31:30.968804 [error] [MainThread]: [31mFailure in model stg_table1 (models/staging/stg_table1.sql)[0m
+[0m10:31:30.969544 [error] [MainThread]:   Runtime Error in model stg_table1 (models/staging/stg_table1.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table1"
+           ^
+[0m10:31:30.970708 [info ] [MainThread]: 
+[0m10:31:30.971655 [info ] [MainThread]:   compiled code at target/compiled/duckdb/models/staging/stg_table1.sql
+[0m10:31:30.972590 [info ] [MainThread]: 
+[0m10:31:30.973518 [error] [MainThread]: [31mFailure in model stg_table2 (models/staging/stg_table2.sql)[0m
+[0m10:31:30.974362 [error] [MainThread]:   Runtime Error in model stg_table2 (models/staging/stg_table2.sql)
+  Parser Error: syntax error at or near "FROM"
+  
+  LINE 21: FROM "Climate_Era5"."Bronze"."Table2"
+           ^
+[0m10:31:30.975103 [info ] [MainThread]: 
+[0m10:31:30.975941 [info ] [MainThread]:   compiled code at target/compiled/duckdb/models/staging/stg_table2.sql
+[0m10:31:30.976974 [info ] [MainThread]: 
+[0m10:31:30.978031 [info ] [MainThread]: Done. PASS=0 WARN=0 ERROR=2 SKIP=0 NO-OP=0 TOTAL=2
+[0m10:31:30.980314 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 9.15711, "process_in_blocks": "48", "process_kernel_time": 0.711304, "process_mem_max_rss": "272892", "process_out_blocks": "133448", "process_user_time": 3.234344}
+[0m10:31:30.981635 [debug] [MainThread]: Command `dbt run` failed at 10:31:30.981445 after 9.16 seconds
+[0m10:31:30.982465 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ff0af170>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531edad2240>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7531ffb340b0>]}
+[0m10:31:30.983241 [debug] [MainThread]: Flushing usage events
+[0m10:31:31.887070 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:35:00.729866 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a655e210>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a655e270>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a6c8f7a0>]}
+
+
+============================== 10:35:00.733542 | 724933cd-0894-41a8-8915-0818819d094c ==============================
+[0m10:35:00.733542 [info ] [MainThread]: Running with dbt=1.11.6
+[0m10:35:00.734202 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'write_json': 'True', 'partial_parse': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'use_colors': 'True', 'indirect_selection': 'eager', 'fail_fast': 'False', 'send_anonymous_usage_stats': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'quiet': 'False', 'no_print': 'None', 'version_check': 'True', 'log_format': 'default', 'target_path': 'None', 'empty': 'False', 'log_path': '/usr/local/airflow/include/dbt/logs', 'profiles_dir': '/usr/local/airflow/include/dbt/', 'invocation_command': 'dbt run --profiles-dir /usr/local/airflow/include/dbt/', 'cache_selected_only': 'False', 'static_parser': 'True', 'debug': 'False', 'warn_error': 'None', 'use_experimental_parser': 'False'}
+[0m10:35:00.925375 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a5c44ef0>]}
+[0m10:35:00.971473 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a5e73ef0>]}
+[0m10:35:00.973507 [info ] [MainThread]: Registered adapter: duckdb=1.9.0
+[0m10:35:01.073669 [debug] [MainThread]: checksum: ec27062d18352e9cfca161c166fcc73d2201661a23a3cf3c89196a27f32cfcb8, vars: {}, profile: , target: , version: 1.11.6
+[0m10:35:02.036151 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 2 files changed.
+[0m10:35:02.036951 [debug] [MainThread]: Partial parsing: updated file: duckdb://models/staging/stg_table1.sql
+[0m10:35:02.037723 [debug] [MainThread]: Partial parsing: updated file: duckdb://models/staging/stg_table2.sql
+[0m10:35:02.223071 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.duckdb.meta.cosmos.operator_kwargs
+[0m10:35:02.232737 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78109bd47950>]}
+[0m10:35:02.308388 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m10:35:02.314874 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m10:35:02.341337 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78109c0b8110>]}
+[0m10:35:02.342370 [info ] [MainThread]: Found 3 models, 2 sources, 571 macros
+[0m10:35:02.343210 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78109c163b30>]}
+[0m10:35:02.345382 [info ] [MainThread]: 
+[0m10:35:02.346359 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m10:35:02.347791 [info ] [MainThread]: 
+[0m10:35:02.349483 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m10:35:02.354647 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_Climate_Era5'
+[0m10:35:02.395038 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5"
+[0m10:35:02.395763 [debug] [ThreadPool]: On list_Climate_Era5: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5"} */
+
+    
+    select schema_name
+    from system.information_schema.schemata
+    
+    where lower(catalog_name) = '"climate_era5"'
+    
+  
+  
+[0m10:35:02.396292 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m10:35:04.456816 [debug] [ThreadPool]: SQL status: OK in 2.060 seconds
+[0m10:35:04.459389 [debug] [ThreadPool]: On list_Climate_Era5: Close
+[0m10:35:04.460936 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_Climate_Era5, now create_Climate_Era5_main)
+[0m10:35:04.461963 [debug] [ThreadPool]: Creating schema "database: "Climate_Era5"
+schema: "main"
+"
+[0m10:35:04.467385 [debug] [ThreadPool]: Using duckdb connection "create_Climate_Era5_main"
+[0m10:35:04.468402 [debug] [ThreadPool]: On create_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "create_Climate_Era5_main"} */
+
+    
+        select type from duckdb_databases()
+        where lower(database_name)='climate_era5'
+        and type='sqlite'
+    
+  
+[0m10:35:04.469293 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m10:35:04.471149 [debug] [ThreadPool]: SQL status: OK in 0.002 seconds
+[0m10:35:04.472646 [debug] [ThreadPool]: Using duckdb connection "create_Climate_Era5_main"
+[0m10:35:04.473466 [debug] [ThreadPool]: On create_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "create_Climate_Era5_main"} */
+
+    
+    
+        create schema if not exists "Climate_Era5"."main"
+    
+[0m10:35:04.593551 [debug] [ThreadPool]: SQL status: OK in 0.119 seconds
+[0m10:35:04.596732 [debug] [ThreadPool]: On create_Climate_Era5_main: Close
+[0m10:35:04.599237 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly create_Climate_Era5_main, now list_Climate_Era5_main)
+[0m10:35:04.604926 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_main"
+[0m10:35:04.605919 [debug] [ThreadPool]: On list_Climate_Era5_main: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_main"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'main'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m10:35:04.606896 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m10:35:04.617326 [debug] [ThreadPool]: SQL status: OK in 0.010 seconds
+[0m10:35:04.618885 [debug] [ThreadPool]: On list_Climate_Era5_main: Close
+[0m10:35:04.619961 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78109c0bbb60>]}
+[0m10:35:04.620683 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:35:04.621266 [debug] [MainThread]: On master: BEGIN
+[0m10:35:04.621845 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m10:35:04.623417 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m10:35:04.624115 [debug] [MainThread]: On master: COMMIT
+[0m10:35:04.624797 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:35:04.625425 [debug] [MainThread]: On master: COMMIT
+[0m10:35:04.626274 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m10:35:04.626989 [debug] [MainThread]: On master: Close
+[0m10:35:04.629478 [debug] [Thread-1 (]: Began running node model.duckdb.stg_table1
+[0m10:35:04.630378 [info ] [Thread-1 (]: 1 of 2 START sql table model main.stg_table1 ................................... [RUN]
+[0m10:35:04.631277 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_Climate_Era5_main, now model.duckdb.stg_table1)
+[0m10:35:04.631792 [debug] [Thread-1 (]: Began compiling node model.duckdb.stg_table1
+[0m10:35:04.637597 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.stg_table1"
+[0m10:35:04.648939 [debug] [Thread-1 (]: Began executing node model.duckdb.stg_table1
+[0m10:35:04.672312 [debug] [Thread-1 (]: Writing runtime sql for node "model.duckdb.stg_table1"
+[0m10:35:04.693425 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table1"
+[0m10:35:04.694592 [debug] [Thread-1 (]: On model.duckdb.stg_table1: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table1"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table1__dbt_tmp"
+  
+    as (
+      SELECT 
+  valid_time AS datetime_id,
+  latitude, 
+  longitude,
+  tp as total_precipitation,
+  ssrd as rayonnement_solaire_surface,
+  e as evaporation_reelle,
+  pev as evaporation_potentielle,
+  ro as ruissellement
+FROM "Climate_Era5"."Bronze"."Table1" 
+WHERE number=0
+    );
+  
+  
+[0m10:35:04.695743 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m10:35:04.950607 [debug] [Thread-1 (]: SQL status: OK in 0.255 seconds
+[0m10:35:04.955831 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table1"
+[0m10:35:04.956561 [debug] [Thread-1 (]: On model.duckdb.stg_table1: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table1"} */
+alter table "Climate_Era5"."main"."stg_table1__dbt_tmp" rename to "stg_table1"
+[0m10:35:05.189346 [debug] [Thread-1 (]: SQL status: OK in 0.232 seconds
+[0m10:35:05.205332 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table1"
+[0m10:35:05.206504 [debug] [Thread-1 (]: On model.duckdb.stg_table1: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table1"} */
+drop table if exists "Climate_Era5"."main"."stg_table1__dbt_backup" cascade
+[0m10:35:05.326411 [debug] [Thread-1 (]: SQL status: OK in 0.119 seconds
+[0m10:35:05.330706 [debug] [Thread-1 (]: On model.duckdb.stg_table1: Close
+[0m10:35:05.333050 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810981d42f0>]}
+[0m10:35:05.334328 [info ] [Thread-1 (]: 1 of 2 OK created sql table model main.stg_table1 .............................. [[32mOK[0m in 0.70s]
+[0m10:35:05.335412 [debug] [Thread-1 (]: Finished running node model.duckdb.stg_table1
+[0m10:35:05.336087 [debug] [Thread-1 (]: Began running node model.duckdb.stg_table2
+[0m10:35:05.336713 [info ] [Thread-1 (]: 2 of 2 START sql table model main.stg_table2 ................................... [RUN]
+[0m10:35:05.337313 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.duckdb.stg_table1, now model.duckdb.stg_table2)
+[0m10:35:05.337906 [debug] [Thread-1 (]: Began compiling node model.duckdb.stg_table2
+[0m10:35:05.385276 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.stg_table2"
+[0m10:35:05.401950 [debug] [Thread-1 (]: Began executing node model.duckdb.stg_table2
+[0m10:35:05.405007 [debug] [Thread-1 (]: Writing runtime sql for node "model.duckdb.stg_table2"
+[0m10:35:05.419021 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table2"
+[0m10:35:05.419907 [debug] [Thread-1 (]: On model.duckdb.stg_table2: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table2"} */
+
+  
+    
+    
+
+    create  table
+      "Climate_Era5"."main"."stg_table2__dbt_tmp"
+  
+    as (
+      SELECT 
+valid_time AS datetime_id,
+latitude,
+longitude,
+t2m as temperature,
+d2m as temperature_point_rosee,
+si10 as vitesse_vent,
+stl1 as temperature_sol_couche1,
+swvl1 as humidite_volumique_sol1
+FROM "Climate_Era5"."Bronze"."Table2"
+WHERE number=0
+    );
+  
+  
+[0m10:35:05.420972 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m10:35:05.678514 [debug] [Thread-1 (]: SQL status: OK in 0.257 seconds
+[0m10:35:05.681391 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table2"
+[0m10:35:05.682291 [debug] [Thread-1 (]: On model.duckdb.stg_table2: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table2"} */
+alter table "Climate_Era5"."main"."stg_table2__dbt_tmp" rename to "stg_table2"
+[0m10:35:05.921433 [debug] [Thread-1 (]: SQL status: OK in 0.238 seconds
+[0m10:35:05.924981 [debug] [Thread-1 (]: Using duckdb connection "model.duckdb.stg_table2"
+[0m10:35:05.925832 [debug] [Thread-1 (]: On model.duckdb.stg_table2: /* {"app": "dbt", "dbt_version": "1.11.6", "profile_name": "duckdb", "target_name": "dev", "node_id": "model.duckdb.stg_table2"} */
+drop table if exists "Climate_Era5"."main"."stg_table2__dbt_backup" cascade
+[0m10:35:06.043664 [debug] [Thread-1 (]: SQL status: OK in 0.117 seconds
+[0m10:35:06.045431 [debug] [Thread-1 (]: On model.duckdb.stg_table2: Close
+[0m10:35:06.046608 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '724933cd-0894-41a8-8915-0818819d094c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a5c45220>]}
+[0m10:35:06.048142 [info ] [Thread-1 (]: 2 of 2 OK created sql table model main.stg_table2 .............................. [[32mOK[0m in 0.71s]
+[0m10:35:06.050556 [debug] [Thread-1 (]: Finished running node model.duckdb.stg_table2
+[0m10:35:06.052249 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:35:06.052906 [debug] [MainThread]: On master: BEGIN
+[0m10:35:06.053756 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m10:35:06.055518 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m10:35:06.056186 [debug] [MainThread]: On master: COMMIT
+[0m10:35:06.057031 [debug] [MainThread]: Using duckdb connection "master"
+[0m10:35:06.057716 [debug] [MainThread]: On master: COMMIT
+[0m10:35:06.058566 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m10:35:06.059254 [debug] [MainThread]: On master: Close
+[0m10:35:06.060040 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m10:35:06.060639 [debug] [MainThread]: Connection 'model.duckdb.stg_table2' was properly closed.
+[0m10:35:06.061222 [info ] [MainThread]: 
+[0m10:35:06.062314 [info ] [MainThread]: Finished running 2 table models in 0 hours 0 minutes and 3.71 seconds (3.71s).
+[0m10:35:06.063814 [debug] [MainThread]: Command end result
+[0m10:35:06.106028 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m10:35:06.112642 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m10:35:06.123127 [debug] [MainThread]: Wrote artifact RunExecutionResult to /usr/local/airflow/include/dbt/target/run_results.json
+[0m10:35:06.123726 [info ] [MainThread]: 
+[0m10:35:06.124655 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m10:35:06.125603 [info ] [MainThread]: 
+[0m10:35:06.126803 [info ] [MainThread]: Done. PASS=2 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=2
+[0m10:35:06.128854 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 5.480585, "process_in_blocks": "0", "process_kernel_time": 0.481468, "process_mem_max_rss": "190016", "process_out_blocks": "0", "process_user_time": 2.754163}
+[0m10:35:06.129901 [debug] [MainThread]: Command `dbt run` succeeded at 10:35:06.129783 after 5.48 seconds
+[0m10:35:06.130413 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a6762b40>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a67617c0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7810a6b21130>]}
+[0m10:35:06.130997 [debug] [MainThread]: Flushing usage events
+[0m10:35:07.001654 [debug] [MainThread]: An error was encountered while trying to flush usage events

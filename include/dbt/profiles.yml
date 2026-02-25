@@ -1,0 +1,8 @@
+duckdb:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "md:Climate_Era5?motherduck_token={{env_var('MOTHERDUCK_TOKEN')}}"
+      threads: 1
+      
