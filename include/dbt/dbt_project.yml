@@ -32,9 +32,17 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   duckdb:
-    # Config indicated by + and applies to all files under models/example/
-      +materialized: table
-      meta:
-        cosmos:
-          operator_kwargs:
-            pool: expensive-pool
+    staging:
+        +materialized: view
+        +schema: Silver
+
+    marts:
+        +materialized: table
+        +schema: Gold
+
+
+        meta:
+          cosmos:
+            operator_kwargs:
+              pool: expensive-pool
+

@@ -14,6 +14,10 @@ import xarray as xr
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from datetime import datetime
+from include.dbt.cosmos_config import DBT_PROJECT_CONFIG, DBT_CONFIG
+from cosmos.airflow.task_group import DbtTaskGroup
+from cosmos.constants import LoadMode
+from cosmos.config import ProjectConfig, RenderConfig
 
 MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
 CDSAPI_KEY = os.getenv("CDSAPI_KEY")
@@ -76,7 +80,7 @@ def era5_in_taskflow():
         for i, nc_file in enumerate(nc_files, start=1):
            ds = xr.open_dataset(os.path.join(extract_dir, nc_file))
            df = ds.to_dataframe().reset_index()
-           csv_path = os.path.join(extract_dir, f"Table{i}.csv")
+           csv_path = os.path.join(extract_dir, f"General{i}.csv")
            df.to_csv(csv_path, index=False)
            print(f"Table{i}: {df.shape[0]} rows")
            os.remove(os.path.join(extract_dir, nc_file))
@@ -95,12 +99,36 @@ def era5_in_taskflow():
             CREATE OR REPLACE TABLE Climate_Era5.Bronze.{name}
             AS SELECT * FROM read_csv_auto('{filepath}')
             """)
-
         conn.close()
-    
+        for i, csv_file in enumerate(csv_files, start=1):
+          os.remove(os.path.join(extract_dir, csv_file))
+
+    staging = DbtTaskGroup(
+        group_id='staging',
+        project_config=DBT_PROJECT_CONFIG,
+        profile_config=DBT_CONFIG,
+        render_config=RenderConfig(
+            load_method=LoadMode.DBT_LS,
+            select=['path:models/staging']
+        )
+    )
+
+    marts = DbtTaskGroup(
+        group_id='marts',
+        project_config=DBT_PROJECT_CONFIG,
+        profile_config=DBT_CONFIG,
+        render_config=RenderConfig(
+            load_method=LoadMode.DBT_LS,
+            select=['path:models/marts']
+        )
+    )
+
 
     chain(retrieve_database(), 
-          ingest_motherduck_database())
+          ingest_motherduck_database(),
+          staging,
+          marts,
+          )
 
 
 era5_in_taskflow()

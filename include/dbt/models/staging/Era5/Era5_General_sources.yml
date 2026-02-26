@@ -5,5 +5,5 @@ sources:
   - name: Bronze
     database: Climate_Era5
     tables:
-      - name: Table1
-      - name: Table2
+      - name: General1
+      - name: General2

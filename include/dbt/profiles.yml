@@ -4,5 +4,6 @@ duckdb:
     dev:
       type: duckdb
       path: "md:Climate_Era5?motherduck_token={{env_var('MOTHERDUCK_TOKEN')}}"
+      schema: Bronze
       threads: 1
       
