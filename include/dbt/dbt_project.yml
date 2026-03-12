@@ -36,6 +36,9 @@ models:
         +materialized: view
         +schema: Silver
 
+    intermediate :
+        +materialized: ephemeral
+
     marts:
         +materialized: table
         +schema: Gold
