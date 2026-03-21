@@ -1,8 +1,8 @@
 """
 ### Use Airflow together with DuckDB and MotherDuck
 
-This DAG shows examples of how to interact with DuckDB and MotherDuck from within
-TaskFlow tasks. The tasks interacting with MotherDuck will need a MotherDuck token.
+This DAG takes the Monthly data from the ERA5 dataset (1940 to present) on the Copernicus Climate Data Store, ingests it into MotherDuck using DuckDB's HTTPFS connector, 
+transforms it with dbt, and finally exports the gold fact table to Cloudflare R2 as a Parquet file.
 """
 
 import cdsapi
@@ -10,6 +10,7 @@ import zipfile
 import os
 import duckdb
 import xarray as xr
+import pandas as pd
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from datetime import datetime
@@ -153,7 +154,7 @@ def build_cds_requests(missing_months):
 def era5_in_taskflow():
 
     @task
-    def retrieve_and_ingest():
+    def retrieve_and_ingest_Era5():
         "Download ERA5 data and ingest directly into MotherDuck (no CSV intermediate)"
 
         latest_loaded = get_latest_month_in_motherduck()
@@ -214,6 +215,24 @@ def era5_in_taskflow():
 
         conn.close()
         print("Ingestion complete.")
+    
+    @task
+    def ingest_GDAM():
+        "LOAD GDAM LVL 1 Geojson into motherduck (bronze schema) as a reference table "
+        conn = duckdb.connect("md:Climate_Era5", config = {"motherduck_token" : MOTHERDUCK_TOKEN})
+        conn.execute("INSTALL Spatial")
+        conn.execute("LOAD Spatial")
+        geojson_path = 'include/dataset/Djibouti_Region.json'
+        conn.execute(f"""
+            CREATE OR REPLACE TABLE Climate_Era5.Bronze.Djibouti_Region 
+            AS SELECT 
+               NAME_1,
+               geom
+               FROM ST_Read('{geojson_path}')
+            """)
+        conn.close()
+        print("GDAM ingestion complete.")
+
 
     staging = DbtTaskGroup(
         group_id='staging',
@@ -233,12 +252,38 @@ def era5_in_taskflow():
             load_method=LoadMode.DBT_LS,
             select=['path:models/marts']
         )
+
     )
+    @task
+    def export_to_R2() :
+        "Exporting the gold fact table into cloudfare as a parquet file for storage"
+        
+        conn = duckdb.connect("md:Climate_Era5", config = {"motherduck_token" : MOTHERDUCK_TOKEN})
+        conn.execute("INSTALL httpfs")
+        conn.execute("LOAD httpfs")
+        conn.execute(f"SET s3_endpoint = '{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com'")
+        conn.execute(f"SET s3_access_key_id = '{os.getenv('R2_ACCESS_KEY_ID')}'")
+        conn.execute(f"SET s3_secret_access_key = '{os.getenv('R2_SECRET_ACCESS_KEY')}'")
+        conn.execute(f"set s3_region = 'auto'")
+        conn.execute(f"SET s3_url_style = 'path'")
+        conn.execute(f"""
+            COPY (SELECT * FROM Climate_Era5.Gold.fact_GeneralEra5)
+            TO 's3://{os.getenv('R2_BUCKET_NAME')}/datasets/Institution/Era5/GeneralEra5.parquet'
+            (FORMAT PARQUET)
+        """)
+        row_count = conn.sql("SELECT COUNT(*) FROM Climate_Era5.Gold.fact_GeneralEra5").fetchone()[0]
+        conn.close()
+        print(f"Exported {row_count} rows to R2")
 
 
-    ingested = retrieve_and_ingest()
 
-    chain(ingested, staging, marts)
+    
+
+    chain(retrieve_and_ingest_Era5(), 
+          ingest_GDAM(),
+          staging, 
+          marts, 
+          export_to_R2())
 
 
 era5_in_taskflow()

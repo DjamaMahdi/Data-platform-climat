@@ -16,5 +16,6 @@ WHERE number=0
 )
 SELECT 
   {{dbt_utils.generate_surrogate_key(['latitude', 'longitude', 'datetime_key'])}} as key_id,
+  {{dbt_utils.generate_surrogate_key(['latitude', 'longitude'])}} as coord_id,  
   *
 FROM stg1

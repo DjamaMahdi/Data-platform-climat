@@ -5,7 +5,12 @@
       "Bash(docker exec:*)",
       "Bash(ls Climate:*)",
       "mcp__claude_ai_MotherDuck__query_rw",
-      "WebSearch"
+      "WebSearch",
+      "mcp__claude_ai_MotherDuck__list_databases",
+      "mcp__claude_ai_MotherDuck__list_tables",
+      "mcp__claude_ai_MotherDuck__list_columns",
+      "Bash(python -c \"import json; f=open\\('C:/Users/Djama/Documents/FAO Climate database/Data platform climat/include/dataset/Djibouti_Region.json'\\); gj=json.load\\(f\\); [print\\(feat['properties']['NAME_1'], feat['properties']['GID_1']\\) for feat in gj['features']]\")",
+      "Bash(cd:*)"
     ]
   }
 }

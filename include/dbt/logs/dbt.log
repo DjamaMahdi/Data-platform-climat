@@ -1865,3 +1865,242 @@ drop table if exists "Climate_Era5"."main"."fact_GeneralEra5__dbt_backup" cascad
 [0m11:14:29.071232 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d10ffac8aa0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d10fe88adb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7d10fe889790>]}
 [0m11:14:29.071978 [debug] [MainThread]: Flushing usage events
 [0m11:14:29.914489 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m06:58:25.680588 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794ab3adbb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794ad3caea0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aafc81a0>]}
+
+
+============================== 06:58:25.683757 | fa212f87-c7e5-401a-9093-490c834275bd ==============================
+[0m06:58:25.683757 [info ] [MainThread]: Running with dbt=1.11.7
+[0m06:58:25.684690 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'profiles_dir': '/usr/local/airflow/include/dbt', 'log_format': 'default', 'warn_error': 'None', 'indirect_selection': 'eager', 'fail_fast': 'False', 'static_parser': 'True', 'use_colors': 'True', 'version_check': 'True', 'empty': 'False', 'target_path': 'None', 'no_print': 'None', 'debug': 'False', 'write_json': 'True', 'log_cache_events': 'False', 'log_path': '/usr/local/airflow/include/dbt/logs', 'invocation_command': 'dbt compile --select int_mappingRegion', 'use_experimental_parser': 'False', 'cache_selected_only': 'False', 'send_anonymous_usage_stats': 'True', 'introspect': 'True', 'quiet': 'False', 'partial_parse': 'True', 'printer_width': '80'}
+[0m06:58:25.911168 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aa67fd70>]}
+[0m06:58:25.969334 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aace0590>]}
+[0m06:58:25.971532 [info ] [MainThread]: Registered adapter: duckdb=1.9.3
+[0m06:58:26.041419 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m06:58:26.119329 [info ] [MainThread]: Unable to do partial parsing because of a version mismatch
+[0m06:58:26.120302 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aaef3650>]}
+[0m06:58:27.692208 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.duckdb.marts.meta.cosmos.operator_kwargs
+[0m06:58:27.700586 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aaf1b0e0>]}
+[0m06:58:27.803719 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m06:58:27.811972 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m06:58:27.849666 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794a0588a70>]}
+[0m06:58:27.850515 [info ] [MainThread]: Found 7 models, 4 sources, 575 macros
+[0m06:58:27.851123 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794a6370560>]}
+[0m06:58:27.853145 [info ] [MainThread]: 
+[0m06:58:27.854031 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m06:58:27.854847 [info ] [MainThread]: 
+[0m06:58:27.855895 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m06:58:27.860421 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_Climate_Era5_Silver'
+[0m06:58:27.898486 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Silver"
+[0m06:58:27.899552 [debug] [ThreadPool]: On list_Climate_Era5_Silver: BEGIN
+[0m06:58:27.900419 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m06:58:30.859757 [debug] [ThreadPool]: SQL status: OK in 2.959 seconds
+[0m06:58:30.860891 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Silver"
+[0m06:58:30.861747 [debug] [ThreadPool]: On list_Climate_Era5_Silver: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_Silver"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'silver'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m06:58:31.144733 [debug] [ThreadPool]: SQL status: OK in 0.282 seconds
+[0m06:58:31.147299 [debug] [ThreadPool]: On list_Climate_Era5_Silver: ROLLBACK
+[0m06:58:31.149106 [debug] [ThreadPool]: Failed to rollback 'list_Climate_Era5_Silver'
+[0m06:58:31.150014 [debug] [ThreadPool]: On list_Climate_Era5_Silver: Close
+[0m06:58:31.151241 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_Climate_Era5_Silver, now list_Climate_Era5_Gold)
+[0m06:58:31.153767 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Gold"
+[0m06:58:31.154562 [debug] [ThreadPool]: On list_Climate_Era5_Gold: BEGIN
+[0m06:58:31.155211 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m06:58:31.157305 [debug] [ThreadPool]: SQL status: OK in 0.002 seconds
+[0m06:58:31.157994 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Gold"
+[0m06:58:31.158687 [debug] [ThreadPool]: On list_Climate_Era5_Gold: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_Gold"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'gold'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m06:58:31.162969 [debug] [ThreadPool]: SQL status: OK in 0.003 seconds
+[0m06:58:31.164899 [debug] [ThreadPool]: On list_Climate_Era5_Gold: ROLLBACK
+[0m06:58:31.166345 [debug] [ThreadPool]: Failed to rollback 'list_Climate_Era5_Gold'
+[0m06:58:31.167422 [debug] [ThreadPool]: On list_Climate_Era5_Gold: Close
+[0m06:58:31.168870 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'fa212f87-c7e5-401a-9093-490c834275bd', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794a094bf50>]}
+[0m06:58:31.171572 [debug] [Thread-1 (]: Began running node model.duckdb.int_mappingRegion
+[0m06:58:31.172347 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_Climate_Era5_Gold, now model.duckdb.int_mappingRegion)
+[0m06:58:31.173204 [debug] [Thread-1 (]: Began compiling node model.duckdb.int_mappingRegion
+[0m06:58:31.181998 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.int_mappingRegion"
+[0m06:58:31.202160 [debug] [Thread-1 (]: Finished running node model.duckdb.int_mappingRegion
+[0m06:58:31.205670 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m06:58:31.207612 [debug] [MainThread]: Connection 'model.duckdb.int_mappingRegion' was properly closed.
+[0m06:58:31.210462 [debug] [MainThread]: Command end result
+[0m06:58:31.289631 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m06:58:31.299539 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m06:58:31.312452 [debug] [MainThread]: Wrote artifact RunExecutionResult to /usr/local/airflow/include/dbt/target/run_results.json
+[0m06:58:31.313354 [info ] [MainThread]: Compiled node 'int_mappingRegion' is:
+WITH grid_cells AS (
+    -- Each grid cell is defined as a 0.25 x 0.25 degree square centered on the latitude and longitude points and we calculate the area of overlap with the regions
+    SELECT DISTINCT
+        latitude,
+        longitude,
+        ST_MakeEnvelope(
+            longitude - 0.125,
+            latitude  - 0.125,
+            longitude + 0.125,
+            latitude  + 0.125
+        ) AS cell_geom
+    FROM "Climate_Era5"."Silver"."stg_General_1"
+),
+
+overlaps AS (
+    -- Measure how much each grid cell overlaps with the regions
+    SELECT
+        g.latitude,
+        g.longitude,
+        d.Region,
+        ST_Area(ST_Intersection(g.cell_geom, d.coordinates)) AS overlap_area
+    FROM grid_cells g
+    CROSS JOIN "Climate_Era5"."Silver"."stg_Djibouti_Region" d
+    WHERE ST_Intersects(g.cell_geom, d.coordinates)
+)
+
+-- For each grid cell, assign the region with the largest overlap area
+SELECT
+    md5(cast(coalesce(cast(latitude as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(longitude as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS coord_id,
+    latitude,
+    longitude,
+    Region
+FROM overlaps
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY latitude, longitude
+    ORDER BY overlap_area DESC
+) = 1
+[0m06:58:31.316641 [debug] [MainThread]: Resource report: {"command_name": "compile", "command_success": true, "command_wall_clock_time": 5.7320995, "process_in_blocks": "8", "process_kernel_time": 0.451175, "process_mem_max_rss": "218472", "process_out_blocks": "0", "process_user_time": 4.527583}
+[0m06:58:31.317682 [debug] [MainThread]: Command `dbt compile` succeeded at 06:58:31.317534 after 5.73 seconds
+[0m06:58:31.319932 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794ab3adbb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794aa635eb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7794ab7c4aa0>]}
+[0m06:58:31.320937 [debug] [MainThread]: Flushing usage events
+[0m06:58:32.367930 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m06:58:40.310695 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2eb60a780>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2eb589070>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2eb609520>]}
+
+
+============================== 06:58:40.314341 | aa6469c6-3901-4033-88cf-c760daa8b259 ==============================
+[0m06:58:40.314341 [info ] [MainThread]: Running with dbt=1.11.7
+[0m06:58:40.315149 [debug] [MainThread]: running dbt with arguments {'write_json': 'True', 'cache_selected_only': 'False', 'printer_width': '80', 'version_check': 'True', 'log_cache_events': 'False', 'invocation_command': 'dbt run --select int_mappingRegion', 'target_path': 'None', 'debug': 'False', 'introspect': 'True', 'empty': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'use_experimental_parser': 'False', 'no_print': 'None', 'profiles_dir': '/usr/local/airflow/include/dbt', 'fail_fast': 'False', 'log_format': 'default', 'send_anonymous_usage_stats': 'True', 'warn_error': 'None', 'log_path': '/usr/local/airflow/include/dbt/logs', 'static_parser': 'True', 'partial_parse': 'True', 'indirect_selection': 'eager', 'quiet': 'False', 'use_colors': 'True'}
+[0m06:58:40.529076 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2ea9be390>]}
+[0m06:58:40.582484 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2eb725280>]}
+[0m06:58:40.584301 [info ] [MainThread]: Registered adapter: duckdb=1.9.3
+[0m06:58:40.654631 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m06:58:41.391450 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m06:58:41.392004 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m06:58:41.392436 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m06:58:41.397505 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.duckdb.marts.meta.cosmos.operator_kwargs
+[0m06:58:41.421546 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2e0dd5760>]}
+[0m06:58:41.626498 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m06:58:41.631566 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m06:58:41.667269 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2e0b476e0>]}
+[0m06:58:41.668000 [info ] [MainThread]: Found 7 models, 4 sources, 575 macros
+[0m06:58:41.668847 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2e09feb70>]}
+[0m06:58:41.671210 [info ] [MainThread]: 
+[0m06:58:41.671915 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m06:58:41.672504 [info ] [MainThread]: 
+[0m06:58:41.673342 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m06:58:41.677751 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_Climate_Era5_Silver'
+[0m06:58:41.705221 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Silver"
+[0m06:58:41.705907 [debug] [ThreadPool]: On list_Climate_Era5_Silver: BEGIN
+[0m06:58:41.706494 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m06:58:43.532717 [debug] [ThreadPool]: SQL status: OK in 1.826 seconds
+[0m06:58:43.533626 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Silver"
+[0m06:58:43.534622 [debug] [ThreadPool]: On list_Climate_Era5_Silver: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_Silver"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'silver'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m06:58:43.698511 [debug] [ThreadPool]: SQL status: OK in 0.163 seconds
+[0m06:58:43.700403 [debug] [ThreadPool]: On list_Climate_Era5_Silver: ROLLBACK
+[0m06:58:43.702267 [debug] [ThreadPool]: Failed to rollback 'list_Climate_Era5_Silver'
+[0m06:58:43.703244 [debug] [ThreadPool]: On list_Climate_Era5_Silver: Close
+[0m06:58:43.704477 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_Climate_Era5_Silver, now list_Climate_Era5_Gold)
+[0m06:58:43.706706 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Gold"
+[0m06:58:43.707482 [debug] [ThreadPool]: On list_Climate_Era5_Gold: BEGIN
+[0m06:58:43.708351 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m06:58:43.710134 [debug] [ThreadPool]: SQL status: OK in 0.002 seconds
+[0m06:58:43.711182 [debug] [ThreadPool]: Using duckdb connection "list_Climate_Era5_Gold"
+[0m06:58:43.712108 [debug] [ThreadPool]: On list_Climate_Era5_Gold: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "duckdb", "target_name": "dev", "connection_name": "list_Climate_Era5_Gold"} */
+select
+      'Climate_Era5' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'gold'
+    and lower(table_catalog) = 'climate_era5'
+  
+[0m06:58:43.715564 [debug] [ThreadPool]: SQL status: OK in 0.003 seconds
+[0m06:58:43.717194 [debug] [ThreadPool]: On list_Climate_Era5_Gold: ROLLBACK
+[0m06:58:43.718519 [debug] [ThreadPool]: Failed to rollback 'list_Climate_Era5_Gold'
+[0m06:58:43.719385 [debug] [ThreadPool]: On list_Climate_Era5_Gold: Close
+[0m06:58:43.720858 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'aa6469c6-3901-4033-88cf-c760daa8b259', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2e0dd56a0>]}
+[0m06:58:43.721900 [debug] [MainThread]: Using duckdb connection "master"
+[0m06:58:43.722749 [debug] [MainThread]: On master: BEGIN
+[0m06:58:43.723563 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m06:58:43.725565 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m06:58:43.726448 [debug] [MainThread]: On master: COMMIT
+[0m06:58:43.727457 [debug] [MainThread]: Using duckdb connection "master"
+[0m06:58:43.728303 [debug] [MainThread]: On master: COMMIT
+[0m06:58:43.729500 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m06:58:43.730407 [debug] [MainThread]: On master: Close
+[0m06:58:43.733670 [debug] [Thread-1 (]: Began running node model.duckdb.int_mappingRegion
+[0m06:58:43.734710 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_Climate_Era5_Gold, now model.duckdb.int_mappingRegion)
+[0m06:58:43.735847 [debug] [Thread-1 (]: Began compiling node model.duckdb.int_mappingRegion
+[0m06:58:43.751487 [debug] [Thread-1 (]: Writing injected SQL for node "model.duckdb.int_mappingRegion"
+[0m06:58:43.778197 [debug] [Thread-1 (]: Finished running node model.duckdb.int_mappingRegion
+[0m06:58:43.780271 [debug] [MainThread]: Using duckdb connection "master"
+[0m06:58:43.781086 [debug] [MainThread]: On master: BEGIN
+[0m06:58:43.781658 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m06:58:43.783346 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m06:58:43.784058 [debug] [MainThread]: On master: COMMIT
+[0m06:58:43.784727 [debug] [MainThread]: Using duckdb connection "master"
+[0m06:58:43.785387 [debug] [MainThread]: On master: COMMIT
+[0m06:58:43.786413 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m06:58:43.787116 [debug] [MainThread]: On master: Close
+[0m06:58:43.787745 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m06:58:43.788392 [debug] [MainThread]: Connection 'model.duckdb.int_mappingRegion' was properly closed.
+[0m06:58:43.788998 [info ] [MainThread]: 
+[0m06:58:43.789743 [info ] [MainThread]: Finished running  in 0 hours 0 minutes and 2.12 seconds (2.12s).
+[0m06:58:43.790662 [debug] [MainThread]: Command end result
+[0m06:58:43.830762 [debug] [MainThread]: Wrote artifact WritableManifest to /usr/local/airflow/include/dbt/target/manifest.json
+[0m06:58:43.837431 [debug] [MainThread]: Wrote artifact SemanticManifest to /usr/local/airflow/include/dbt/target/semantic_manifest.json
+[0m06:58:43.847000 [debug] [MainThread]: Wrote artifact RunExecutionResult to /usr/local/airflow/include/dbt/target/run_results.json
+[0m06:58:43.848474 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 3.4785388, "process_in_blocks": "0", "process_kernel_time": 0.290066, "process_mem_max_rss": "213328", "process_out_blocks": "0", "process_user_time": 3.415048}
+[0m06:58:43.849427 [debug] [MainThread]: Command `dbt run` succeeded at 06:58:43.849330 after 3.48 seconds
+[0m06:58:43.850193 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2ebbeaf90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2ebbeaf30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x73e2ea96f980>]}
+[0m06:58:43.850961 [debug] [MainThread]: Flushing usage events
+[0m06:58:44.545512 [debug] [MainThread]: An error was encountered while trying to flush usage events

@@ -1,50 +1,22 @@
-[2026-03-08 13:19:37] ERROR - Task failed with exception
-HTTPError: 400 Client Error: Bad Request for url: https://cds.climate.copernicus.eu/api/retrieve/v1/jobs/2b2f315c-2fea-4a74-95c9-745b91364b5c/results
-The job has failed
-MARS has returned an error, please check your selection.
-Request submitted to the MARS server:
-[{'area': ['12.7', '41.7', '10.9', '43.5'], 'dataset': ['reanalysis-monthly-means-of-daily-means'], 'time': ['00:00:00'], 'param': ['168', '167', '228', '207', '169', '182', '228251', '205', '139', '39'], 'class': ['ea'], 'expect': ['any'], 'number': ['all'], 'levtype': ['sfc'], 'date': ['2026-01-01', '2026-02-01']}]
-Full error message:
-mars - ERROR  - 20260308.101933 - Mars server task finished in error
-mars - ERROR  - 20260308.101933 - AccessError: Restricted access to ERA5T/ERA5LANDT Monthly means. Please, check that your date selection is valid. [mars]
-mars - ERROR  - 20260308.101933 - Error code is -2
-mars - ERROR  - 20260308.101934 - Last error is -2
-mars - ERROR  - 20260308.101934 - Request failed
-mars - ERROR  - 20260308.101934 - Some errors reported (last error -2)
-
-The job failed with: MarsRuntimeError
+ [2026-03-17 09:56:13] ERROR - Task failed with exception
+CosmosDbtRunError: dbt invocation completed with errors: fact_GeneralEra5: Runtime Error in model fact_GeneralEra5 (models/marts/Era5/fact_GeneralEra5.sql)
+  Parser Error: syntax error at or near "overlaps"
+  
+  LINE 48: overlaps AS (
+           ^
 Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", ligne 1068 dans run
 
 Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", ligne 1477 dans _execute_task
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", ligne 417 dans wrapper
+Fichier "/usr/local/lib/python3.12/site-packages/cosmos/operators/base.py", ligne 310 dans execute
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py", ligne 252 dans execute
+Fichier "/usr/local/lib/python3.12/site-packages/cosmos/operators/local.py", ligne 842 dans build_and_run_cmd
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", ligne 417 dans wrapper
+Fichier "/usr/local/lib/python3.12/site-packages/cosmos/operators/local.py", ligne 639 dans run_command
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", ligne 228 dans execute
+Fichier "/usr/local/lib/python3.12/site-packages/cosmos/operators/local.py", ligne 258 dans handle_exception_dbt_runner
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", ligne 251 dans execute_callable
+Fichier "/usr/local/lib/python3.12/site-packages/cosmos/dbt/runner.py", ligne 113 dans handle_exception_if_needed
 
-Fichier "/usr/local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py", ligne 82 dans run
-
-Fichier "/usr/local/airflow/dags/General_Era5.py", ligne 142 dans retrieve_database
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/legacy_client.py", ligne 167 dans retrieve
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/client.py", ligne 414 dans submit_and_wait_on_results
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 495 dans get_results
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 479 dans _make_results
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 457 dans _wait_on_results
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 471 dans results_ready
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 485 dans _make_results
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 176 dans from_request
-
-Fichier "/usr/local/lib/python3.12/site-packages/ecmwf/datastores/processing.py", ligne 99 dans cads_raise_for_status
+[2026-03-17 09:56:13] ERROR - /usr/local/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+[2026-03-17 09:56:13] ERROR -   warnings.warn('resource_tracker: There appear to be %d '

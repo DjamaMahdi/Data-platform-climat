@@ -97,17 +97,17 @@ ERA5 monthly mean temperatures for Djibouti were cross-checked against published
 - Zero duplicates in Bronze, Silver, and Gold layers
 
 ## MotherDuck
-- Database: `Climate_Era5` | Schema: `Bronze` | Tables: `General1`, `General2` (may grow to General3+ after adding wave/pressure variables)
+- Database: `Climate_Era5` | Schema: `Bronze` | Tables: `General1`, `General2`, `General3`, `Regions_GADM1`
 - Schemas: `Bronze` (raw), `Silver` (staging views), `Gold` (mart tables)
 - Also: `MEDD` (DuckLake), `my_db`
 - Claude can connect directly via MCP MotherDuck tools
 - To force a full reload: drop all Bronze tables → trigger DAG (get_latest_month returns None → FULL LOAD)
 
 ## dbt models
-- **Sources:** `include/dbt/models/staging/Era5/Era5_General_sources.yml` — references `Bronze.General1`, `Bronze.General2`
-- **Staging:** `stg_General_1.sql` (precipitation, radiation, evaporation, runoff), `stg_General_2.sql` (temperature, wind, soil)
+- **Sources:** `include/dbt/models/staging/Era5/Era5_General_sources.yml` — references `Bronze.General1`, `Bronze.General2`, `Bronze.General3`, `Bronze.Regions_GADM1`
+- **Staging:** `stg_General_1.sql` (precipitation, radiation, evaporation, runoff), `stg_General_2.sql` (temperature, wind, soil), `stg_General_3.sql` (wave data), `stg_Grid_Region.sql` (grid point to region mapping)
 - **Intermediate:** `int_datetime.sql` (ephemeral — extracts year, month, day, weekday from valid_time)
-- **Marts:** `fact_GeneralEra5.sql` (joins stg1 + stg2 + int_datetime on surrogate key)
+- **Marts:** `fact_GeneralEra5.sql` (joins stg1 + stg2 + stg3 + int_datetime + stg_Grid_Region on surrogate key / lat+lon)
 - Staging = Silver schema (views), Marts = Gold schema (tables), Intermediate = ephemeral
 - **Note:** dbt models will need updating after new variables are added and tables are reloaded — new columns (msl, sp, sst, mwd, mwp) need to be added to staging/mart SQL and sources.yml if new tables are created
 
@@ -151,6 +151,90 @@ All code changes made to `dags/General_Era5.py` in this session:
 - Update `Era5_General_sources.yml` if new tables are created (General3+)
 - Update `stg_General_1.sql`, `stg_General_2.sql` (or create new staging models) for new columns
 - Update `fact_GeneralEra5.sql` to include new fields
+
+## Parquet Export to Cloudflare R2 (added 2026-03-15)
+
+**Purpose:** Final task in the DAG that exports the Gold `fact_GeneralEra5` table directly from MotherDuck to Cloudflare R2 as Parquet.
+
+**R2 bucket:** `medd`
+**R2 object key:** `s3://medd/dataset/Institution/Era5/General_Era5.parquet`
+**R2 endpoint:** `<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`
+
+**How it works (zero intermediate storage):**
+1. `export_to_r2()` is a `@task` that runs after `marts` completes
+2. Connects to MotherDuck, configures DuckDB's built-in httpfs S3 layer to point at R2
+3. `COPY ... TO 's3://medd/...' (FORMAT PARQUET, COMPRESSION ZSTD)` streams data directly from MotherDuck → R2
+4. No temp files, no RAM buffers — the Airflow container is just a passthrough
+5. Chained last: `chain(ingested, staging, marts, exported)`
+
+**Why Parquet over Excel:**
+- XLSX is a ZIP archive — cannot be streamed, always requires full file in memory or on disk
+- Parquet is streamable, columnar, and 5-10x smaller (ZSTD compressed)
+- DuckDB writes Parquet directly to S3-compatible storage via httpfs — no boto3 or openpyxl needed
+
+**DAG pipeline order:** `retrieve_and_ingest → load_regions_to_bronze → staging (dbt) → marts (dbt) → export_to_r2`
+
+**No new dependencies** — DuckDB's httpfs is bundled. No changes to `requirements.txt`.
+
+**DuckDB S3 settings used in task:**
+- `s3_endpoint` → R2 account endpoint
+- `s3_url_style = 'path'` → R2 uses path-style URLs (not virtual-hosted)
+- `s3_region = 'auto'` → R2 expects `auto`
+
+**R2 credentials in `.env`:**
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`
+
+## GADM Region Mapping (added 2026-03-15)
+
+**Purpose:** Map ERA5 grid points to Djibouti's 6 administrative regions (GADM Level 1) so climate data can be analyzed by region.
+
+**GeoJSON source:** `include/dataset/Djibouti_Region.json` (GADM Level 1)
+**6 regions:** AliSabieh, Arta, Dikhil, Djiboutii, Obock, Tadjoura
+
+**Architecture — two-step approach:**
+
+### Step 1: DAG task `load_regions_to_bronze()` (in `General_Era5.py`)
+- Loads the raw GeoJSON into `Bronze.Regions_GADM1` using DuckDB's `ST_Read()`
+- Requires `INSTALL spatial` + `LOAD spatial` before `ST_Read()` works
+- `CREATE OR REPLACE TABLE` — idempotent, 6 rows (one per region)
+- Columns: NAME_1, GID_1, ISO_1, COUNTRY, geom (MULTIPOLYGON), and other GADM properties
+- GeoJSON path inside Docker: `/usr/local/airflow/include/dataset/Djibouti_Region.json`
+- Chain position: after `retrieve_and_ingest`, before `staging`
+- Code:
+```python
+@task
+def load_regions_to_bronze():
+    """Load GADM Level 1 GeoJSON into Bronze as raw reference data."""
+    conn = duckdb.connect("md:Climate_Era5", config={"motherduck_token": MOTHERDUCK_TOKEN})
+    conn.execute("INSTALL spatial")
+    conn.execute("LOAD spatial")
+    geojson_path = '/usr/local/airflow/include/dataset/Djibouti_Region.json'
+    conn.execute(f"""
+        CREATE OR REPLACE TABLE Climate_Era5.Bronze.Regions_GADM1 AS
+        SELECT * FROM ST_Read('{geojson_path}')
+    """)
+    row_count = conn.sql("SELECT COUNT(*) FROM Climate_Era5.Bronze.Regions_GADM1").fetchone()[0]
+    conn.close()
+    print(f"Loaded {row_count} regions into Bronze.Regions_GADM1")
+```
+
+### Step 2: Spatial join in dbt (user implements)
+- All spatial logic (ST_Contains, ST_Point, point-in-polygon) handled in dbt models, not the DAG
+- Requires `spatial` extension configured in `profiles.yml` (add to extensions list)
+- `stg_Grid_Region.sql`: staging model that does the spatial join between grid points and region polygons
+- `ST_Contains(geom, ST_Point(longitude, latitude))` — note: argument order is (x, y) = (lon, lat)
+- LEFT JOIN so sea/outside-Djibouti points get NULL region
+- `fact_GeneralEra5.sql`: LEFT JOIN stg_Grid_Region on (latitude, longitude) to add region_name, gid_1
+
+**Updated DAG chain:**
+```python
+ingested = retrieve_and_ingest()
+regions_loaded = load_regions_to_bronze()
+exported = export_to_r2()
+chain(ingested, regions_loaded, staging, marts, exported)
+```
+
+**Known limitation:** Current fact table uses INNER JOIN with stg_General_3 (wave data), which keeps only 16 ocean grid points out of 56 total. Most ocean points will have NULL region. To get land-based regional analysis, change that INNER JOIN to LEFT JOIN in fact_GeneralEra5.sql.
 
 ## Airflow / Docker
 - Scheduler container: `data-platform-climat_d199a1-scheduler-1`
