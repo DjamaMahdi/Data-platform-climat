@@ -9,3 +9,8 @@ sources:
       - name: General2
       - name: General3
       - name: Djibouti_Region
+      - name: Ag_humidity_2m
+      - name: Ag_precip_flux
+      - name: Ag_reference_et
+      - name: Ag_temperature_2m
+      - name: Ag_wind_10m

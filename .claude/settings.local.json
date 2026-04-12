@@ -10,7 +10,17 @@
       "mcp__claude_ai_MotherDuck__list_tables",
       "mcp__claude_ai_MotherDuck__list_columns",
       "Bash(python -c \"import json; f=open\\('C:/Users/Djama/Documents/FAO Climate database/Data platform climat/include/dataset/Djibouti_Region.json'\\); gj=json.load\\(f\\); [print\\(feat['properties']['NAME_1'], feat['properties']['GID_1']\\) for feat in gj['features']]\")",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "mcp__claude_ai_MotherDuck__ask_docs_question",
+      "Bash(python -c \"import cdsapi; import xarray; print\\(''cdsapi + xarray available''\\)\")",
+      "Bash(where python3:*)",
+      "Bash(where python:*)",
+      "Bash(python3:*)",
+      "Read(//c/Users/Djama/AppData/Local/Programs/**)",
+      "Bash(ls /c/Python*/python.exe)",
+      "Read(//c/Users/Djama/**)",
+      "Bash(docker ps:*)",
+      "Bash(docker cp:*)"
     ]
   }
 }

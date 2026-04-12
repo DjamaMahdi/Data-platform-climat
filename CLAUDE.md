@@ -236,6 +236,82 @@ chain(ingested, regions_loaded, staging, marts, exported)
 
 **Known limitation:** Current fact table uses INNER JOIN with stg_General_3 (wave data), which keeps only 16 ocean grid points out of 56 total. Most ocean points will have NULL region. To get land-based regional analysis, change that INNER JOIN to LEFT JOIN in fact_GeneralEra5.sql.
 
+## Session Changelog — 2026-04-01
+
+### 1. Date format mismatch bug & fix in `int_datetime.sql`
+
+**Problem:** `Gold.fact_AgricultureEra5` had only 236k rows instead of ~617k. Every month showed exactly 12 days instead of 28-31.
+
+**Root cause:** Date format mismatch between staging models and `int_datetime.sql`:
+- Staging models (`stg_Ag_*.sql`): `strftime("time", '%d/%m/%Y')` → day/month/year (e.g. Jan 5 = `"05/01/2021"`)
+- `int_datetime.sql`: `strftime(date_day, '%m/%d/%Y')` → month/day/year (e.g. Jan 5 = `"01/05/2021"`)
+
+**Impact on INNER JOIN (`t1.datetime_id = dt.datetime_id`):**
+- **Days 1-12**: join succeeds but dates are **scrambled** (day/month swapped) — staging's Jan 5 (`"05/01/2021"`) matches int_datetime's May 1 (`"05/01/2021"`)
+- **Days 13-31**: join fails (no month 13-31 exists) → rows **silently dropped** (~60% of data)
+- Result: 236k rows instead of 617k, with wrong datetime values on every surviving row
+
+**Fix:** Changed `int_datetime.sql` line 14 from `'%m/%d/%Y'` to `'%d/%m/%Y'` to match staging models.
+
+**Rule:** All models generating `datetime_id` must use the same `strftime` format. Current standard is `'%d/%m/%Y'` (day/month/year).
+
+### 2. Region mapping: INNER JOIN → LEFT JOIN in `int_AgricultureERA5.sql`
+
+**Problem:** With INNER JOIN on `int_Ag_mappingRegion`, fact table dropped from 617k to ~430k rows — 98 out of 324 grid points are ocean/outside Djibouti and have no region match.
+
+**Grid point breakdown:**
+- **324 total** grid points in the Djibouti bounding box (0.1° resolution)
+- **226 land** grid points that overlap with a Djibouti region
+- **98 ocean/outside** grid points with no region match
+
+**Fix:** Changed to `LEFT JOIN` on `int_Ag_mappingRegion` in `int_AgricultureERA5.sql` line 26. Ocean points now kept with `Region = NULL`.
+
+### 3. Agriculture dbt models (current state)
+
+**Staging (Silver views):**
+- `stg_Ag_temperature_2m.sql` — Kelvin→Celsius, surrogate keys (`key_id` = lat+lon+datetime_id, `coord_id` = lat+lon)
+- `stg_Ag_wind_10m.sql`, `stg_Ag_humidity_2m.sql` (/100→decimal), `stg_Ag_precip_flux.sql`, `stg_Ag_reference_et.sql` — same key structure
+- `stg_Djibouti_Region.sql` — region names + geometries from `Bronze.Djibouti_Region`
+
+**Intermediate (ephemeral):**
+- `int_Ag_mappingRegion.sql` — spatial join: 0.1°×0.1° grid cell envelopes × regions, assigns each grid point to region with largest overlap
+- `int_AgricultureERA5.sql` — INNER JOINs 5 staging tables on `key_id`, LEFT JOIN region on `coord_id`, INNER JOIN `int_datetime` on `datetime_id`
+- `int_datetime.sql` — shared date spine (1940 to today), format `'%d/%m/%Y'`
+
+**Marts (Gold table):**
+- `fact_AgricultureEra5.sql` — columns: datetime, year, month_year, lat, lon, Region, Temp_Max/Mean/Min_24h, Wind_Speed, Reference_ET, Precipitation_Flux, Relative_Humidity
+
+### 4. Agriculture Bronze table status (2026-04-01)
+
+| Table | Rows | Date Range | Grid Points |
+|---|---|---|---|
+| `Ag_temperature_2m` | 617,868 | 2021-01-01 to 2026-03-22 | 324 |
+| `Ag_reference_et` | 617,544 | 2021-01-01 to 2026-03-21 | 324 |
+| `Ag_precip_flux` | 616,896 | 2021-01-01 to 2026-03-19 | 324 |
+| `Ag_humidity_2m` | 616,572 | 2021-01-01 to 2026-03-18 | 324 |
+| `Ag_wind_10m` | 616,572 | 2021-01-01 to 2026-03-18 | 324 |
+
+**Gold fact table:** ~617k rows (LEFT JOIN on region), date range 2021-01-01 to 2026-03-18 (bounded by common minimum across 5 tables), 324 grid points (226 with region, 98 ocean with `Region = NULL`).
+
+### 5. Agriculture DAG: current 5 variables
+
+DAG reduced from 14 to 5 variables:
+
+| Variable | Statistics | Bronze Table |
+|---|---|---|
+| `2m_temperature` | 24h max/mean/min | `Ag_temperature_2m` |
+| `10m_wind_speed` | 24_hour_mean | `Ag_wind_10m` |
+| `2m_relative_humidity` | time=12_00 | `Ag_humidity_2m` |
+| `precipitation_flux` | none | `Ag_precip_flux` |
+| `reference_evapotranspiration` | none | `Ag_reference_et` |
+
+### Pending work
+- [ ] Consider materializing Silver as tables (not views) — millions of rows per staging model
+- [ ] Add R2 export task for the agriculture fact table
+- [ ] Uncomment export task in Agriculture DAG chain
+- [ ] Add remaining 9 agro variables back to DAG when CDS quota allows
+- [ ] Create dbt sources YAML for Agriculture Bronze tables
+
 ## Airflow / Docker
 - Scheduler container: `data-platform-climat_d199a1-scheduler-1`
 - Trigger DAG: `docker exec <scheduler> airflow dags trigger era5_in_taskflow`

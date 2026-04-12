@@ -1,6 +1,7 @@
 -- fact_GeneralEra5.sql
 
 SELECT
+    key_id,
     datetime,
     year,
     month_year,
@@ -18,6 +19,5 @@ SELECT
     vitesse_vent,
     temperature_sol_couche1,
     humidite_volumique_sol1,
-    direction_moyenne_vagues,
-    periode_moyenne_vagues,
 FROM {{ ref('int_GeneralEra5') }} 
+ORDER BY datetime

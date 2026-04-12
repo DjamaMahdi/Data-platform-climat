@@ -215,24 +215,6 @@ def era5_in_taskflow():
 
         conn.close()
         print("Ingestion complete.")
-    
-    @task
-    def ingest_GDAM():
-        "LOAD GDAM LVL 1 Geojson into motherduck (bronze schema) as a reference table "
-        conn = duckdb.connect("md:Climate_Era5", config = {"motherduck_token" : MOTHERDUCK_TOKEN})
-        conn.execute("INSTALL Spatial")
-        conn.execute("LOAD Spatial")
-        geojson_path = 'include/dataset/Djibouti_Region.json'
-        conn.execute(f"""
-            CREATE OR REPLACE TABLE Climate_Era5.Bronze.Djibouti_Region 
-            AS SELECT 
-               NAME_1,
-               geom
-               FROM ST_Read('{geojson_path}')
-            """)
-        conn.close()
-        print("GDAM ingestion complete.")
-
 
     staging = DbtTaskGroup(
         group_id='staging',
@@ -240,7 +222,7 @@ def era5_in_taskflow():
         profile_config=DBT_CONFIG,
         render_config=RenderConfig(
             load_method=LoadMode.DBT_LS,
-            select=['path:models/staging']
+            select=['path:models/staging/General']
         )
     )
 
@@ -250,7 +232,7 @@ def era5_in_taskflow():
         profile_config=DBT_CONFIG,
         render_config=RenderConfig(
             load_method=LoadMode.DBT_LS,
-            select=['path:models/marts']
+            select=['path:models/marts/General']
         )
 
     )
@@ -268,19 +250,21 @@ def era5_in_taskflow():
         conn.execute(f"SET s3_url_style = 'path'")
         conn.execute(f"""
             COPY (SELECT * FROM Climate_Era5.Gold.fact_GeneralEra5)
-            TO 's3://{os.getenv('R2_BUCKET_NAME')}/datasets/Institution/Era5/GeneralEra5.parquet'
+            TO 's3://{os.getenv('R2_BUCKET_NAME')}/Copernicus/General/GeneralEra5.parquet'
             (FORMAT PARQUET)
         """)
-        row_count = conn.sql("SELECT COUNT(*) FROM Climate_Era5.Gold.fact_GeneralEra5").fetchone()[0]
+        conn.execute(f"""
+            COPY (SELECT * FROM Climate_Era5.Gold.dim_vagues)
+            TO 's3://{os.getenv('R2_BUCKET_NAME')}/Copernicus/General/vagues.parquet'
+            (FORMAT PARQUET)
+        """)
         conn.close()
-        print(f"Exported {row_count} rows to R2")
 
 
 
     
 
     chain(retrieve_and_ingest_Era5(), 
-          ingest_GDAM(),
           staging, 
           marts, 
           export_to_R2())

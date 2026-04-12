@@ -1,0 +1,1 @@
+why my Climate_Era5.Gold.fact_AgricultureEra5 has 430k rows and Climate_Era5.Bronze.Ag_humidity_2m is 616k
