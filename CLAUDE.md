@@ -336,15 +336,45 @@ Per target: `load_regions()` → `ingest()` → `dbt run` (direct, no cosmos:
 → `export()`. It `os.chdir`s to the repo root so relative paths resolve.
 
 **Workflow:** `.github/workflows/monthly-era5.yml` — cron `0 3 6 * *` +
-`workflow_dispatch`. Installs `requirements-ci.txt` (slim, no Airflow), runs the
-runner, then `curl`s the portal's `POST /api/admin/sync` with the
-`x-admin-secret` header to refresh the Vercel app.
+`workflow_dispatch`. Runs `--target general` only (Agriculture excluded).
+Secrets live in the GitHub **Environment named `Secret`** (not repo secrets), so
+the job declares `environment: Secret`.
 
-**Required GitHub repo secrets** (`Data-platform-climat` → Settings → Secrets →
-Actions): `MOTHERDUCK_TOKEN`, `CDSAPI_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
-`R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `PORTAL_SYNC_URL`
-(`https://data-climat.vercel.app/api/admin/sync`), `ADMIN_SYNC_SECRET` (must
-match the same var set in Vercel).
+**Portal refresh moved into the pipeline (2026-07-01).** The old design
+`curl`ed the portal's `POST /api/admin/sync`, which converted parquet→XLSX in
+the Vercel serverless function. That path is **broken on Vercel**: `hyparquet`
+(ESM-only, imported via `new Function('return import(s)')`) is invisible to
+Next's file tracer and gets dropped from the serverless bundle → `Cannot find
+package 'hyparquet'`, and the error was swallowed (`{success:true}` with nothing
+synced). Neither `outputFileTracingIncludes` nor bundling fixed it (bundling
+broke the build). So the conversion + registration now runs **in the pipeline**:
+
+- `include/pipeline/portal_sync.py` → `register()`: DuckDB reads the gold parquet
+  from R2, writes XLSX back to R2 (`excel` extension, direct to s3), then upserts
+  the portal's Supabase `datasets` rows via PostgREST (service_role).
+  **Preserves admin edits**: existing rows only get `file_size_bytes` refreshed;
+  `name`/`description`/`columns` (edited in the portal UI) are never overwritten.
+  Matches rows by `file_path = r2:<xlsxKey>`. No-op if Supabase env vars absent.
+- `run_pipeline.py` `run_general()` calls `portal_sync.register()` after export.
+- The workflow then pings an **optional Vercel deploy hook** (`VERCEL_DEPLOY_HOOK`)
+  to redeploy the live app. The data is already live via Supabase, so the
+  redeploy is cosmetic.
+
+The portal's `/api/admin/sync` endpoint still exists but is no longer used.
+
+**Required secrets** (`Data-platform-climat` → Settings → Environments →
+`Secret`): `MOTHERDUCK_TOKEN`, `CDSAPI_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `SUPABASE_URL`
+(`https://jzkzgmliyujvabgtjedm.supabase.co`), `SUPABASE_SERVICE_ROLE_KEY` (from
+the portal's `frontend/.env.local`), and optionally `VERCEL_DEPLOY_HOOK`
+(Vercel → project `Data-Climat` → Settings → Git → Deploy Hooks).
+
+**Portal dataset config** (kept in sync with the portal's
+`syncInstitutionalDatasets.ts`): 2 datasets, theme `meteorologie_climat` (id 6),
+source "Copernicus Climate Change Service (ECMWF) — ERA5":
+`Copernicus/General/GeneralEra5.parquet` → *ERA5 - Données climatiques mensuelles
+- Djibouti*, `Copernicus/General/vagues.parquet` → *ERA5 - Données de vagues
+océaniques - Djibouti*. Both currently live on the portal (dataset ids 10 & 11).
 
 ## Airflow / Docker
 - Scheduler container: `data-platform-climat_d199a1-scheduler-1`
