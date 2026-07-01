@@ -1,0 +1,11 @@
+# Slim dependency set for the GitHub Action runner (scripts/run_pipeline.py).
+# No Airflow / Astronomer Cosmos — dbt is invoked directly. Pins mirror requirements.txt.
+dbt-duckdb==1.9.3
+duckdb==1.4.4
+cdsapi>=0.7.7
+xarray[complete]==2026.2.0
+dask[complete]==2026.3.0
+netCDF4
+python-dateutil
+openpyxl==3.1.2
+requests

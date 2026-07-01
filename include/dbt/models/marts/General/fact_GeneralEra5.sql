@@ -2,9 +2,9 @@
 
 SELECT
     key_id,
-    datetime,
-    year,
-    month_year,
+    datetime as Date,
+    year As "Année",
+    month_year as "Mois_Années",
     latitude,
     longitude,
     Region,

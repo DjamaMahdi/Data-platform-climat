@@ -312,6 +312,40 @@ DAG reduced from 14 to 5 variables:
 - [ ] Add remaining 9 agro variables back to DAG when CDS quota allows
 - [ ] Create dbt sources YAML for Agriculture Bronze tables
 
+## GitHub Action migration (added 2026-06-30)
+
+The pipeline now also runs **without Airflow**, monthly, from GitHub Actions —
+the Astronomer/Airflow stack is kept working but is no longer required.
+
+**Shared logic** (no `airflow`/`cosmos` imports) lives in `include/pipeline/`:
+- `general_pipeline.py` — `ingest()` + `export()` (exports `fact_GeneralEra5` →
+  `Copernicus/General/GeneralEra5.parquet` and `dim_vagues` → `.../vagues.parquet`)
+- `agriculture_pipeline.py` — `ingest(raise_on_failure=False)` + `export()`
+  (→ `Copernicus/Agriculture/AgricultureEra5.parquet`)
+- `regions.py` — idempotent `load_regions()` → `Bronze.Djibouti_Region` from
+  `include/dataset/Djibouti_Region.json` (the table the dbt spatial joins read)
+
+The two DAGs (`dags/General_Era5.py`, `dags/Agriculture_Era5.py`) are now thin
+wrappers that import these modules — `dag_id`, chain order, schedule unchanged.
+The DAG agro task calls `ingest()` (swallows per-variable failures, retries next
+run); the CLI runner calls `ingest(raise_on_failure=True)` so CI fails loudly.
+
+**CLI runner:** `scripts/run_pipeline.py --target general|agriculture|all`.
+Per target: `load_regions()` → `ingest()` → `dbt run` (direct, no cosmos:
+`--project-dir include/dbt --profiles-dir include/dbt --select path:models/staging/<X> path:models/marts/<X>`)
+→ `export()`. It `os.chdir`s to the repo root so relative paths resolve.
+
+**Workflow:** `.github/workflows/monthly-era5.yml` — cron `0 3 6 * *` +
+`workflow_dispatch`. Installs `requirements-ci.txt` (slim, no Airflow), runs the
+runner, then `curl`s the portal's `POST /api/admin/sync` with the
+`x-admin-secret` header to refresh the Vercel app.
+
+**Required GitHub repo secrets** (`Data-platform-climat` → Settings → Secrets →
+Actions): `MOTHERDUCK_TOKEN`, `CDSAPI_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `PORTAL_SYNC_URL`
+(`https://data-climat.vercel.app/api/admin/sync`), `ADMIN_SYNC_SECRET` (must
+match the same var set in Vercel).
+
 ## Airflow / Docker
 - Scheduler container: `data-platform-climat_d199a1-scheduler-1`
 - Trigger DAG: `docker exec <scheduler> airflow dags trigger era5_in_taskflow`

@@ -1,0 +1,60 @@
+name: Monthly ERA5 pipeline
+
+# Runs the ERA5 -> MotherDuck -> dbt -> R2 pipeline once a month, then triggers
+# the Vercel portal to ingest the refreshed gold parquet files.
+#
+# The 6th of each month at 03:00 UTC is safely past the ERA5 monthly-means
+# 2-month publication lag and the agrometeorological 15-day lag.
+
+on:
+  schedule:
+    - cron: "0 3 6 * *"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which pipeline(s) to run"
+        type: choice
+        default: all
+        options: [all, general, agriculture]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monthly-era5
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+      CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-ci.txt
+
+      - name: Run ERA5 pipeline
+        run: python scripts/run_pipeline.py --target "${{ github.event.inputs.target || 'all' }}"
+
+      - name: Trigger portal sync
+        env:
+          PORTAL_SYNC_URL: ${{ secrets.PORTAL_SYNC_URL }}
+          ADMIN_SYNC_SECRET: ${{ secrets.ADMIN_SYNC_SECRET }}
+        run: |
+          curl -fsS -X POST "$PORTAL_SYNC_URL" \
+            -H "x-admin-secret: $ADMIN_SYNC_SECRET"

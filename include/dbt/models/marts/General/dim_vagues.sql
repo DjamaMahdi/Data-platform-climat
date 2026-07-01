@@ -1,7 +1,7 @@
 -- dim_vagues.sql
 SELECT DISTINCT
     key_id,
-    datetime_id,
+    datetime_id as Date,
     latitude,
     longitude,
     direction_moyenne_vagues,
