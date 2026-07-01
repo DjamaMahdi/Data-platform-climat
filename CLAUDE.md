@@ -376,6 +376,36 @@ source "Copernicus Climate Change Service (ECMWF) — ERA5":
 - Djibouti*, `Copernicus/General/vagues.parquet` → *ERA5 - Données de vagues
 océaniques - Djibouti*. Both currently live on the portal (dataset ids 10 & 11).
 
+### ⏳ REPRENDRE ICI (handoff 2026-07-01)
+
+**État :** les 2 datasets ERA5 sont **déjà visibles** sur `data-climat.vercel.app`
+(insérés à la main via `portal_sync` exécuté en local — ids 10 & 11). Le code du
+mécanisme récurrent est **poussé** sur `Data-platform-climat` (`main`, commit
+`a698bf6`) et **testé en local** (conserve bien les éditions plateforme).
+
+**Il reste UNIQUEMENT à ajouter des secrets GitHub, puis relancer le workflow :**
+
+1. `Data-platform-climat` → Settings → **Environments → `Secret`** → ajouter :
+   - `SUPABASE_URL` = `https://jzkzgmliyujvabgtjedm.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY` = valeur de `SUPABASE_SERVICE_ROLE_KEY` dans
+     `Application data/fao-climate-portal/frontend/.env.local` (à recopier)
+   - *(optionnel)* `VERCEL_DEPLOY_HOOK` = créer dans Vercel → projet `Data-Climat`
+     → Settings → Git → Deploy Hooks. Sans lui, le step de redeploy est sauté et
+     les données restent quand même à jour (le portail lit Supabase en direct).
+2. Relancer : Actions → *Monthly ERA5 pipeline* → **Run workflow** → vérifier que
+   le step "Run ERA5 pipeline … + refresh portal datasets" affiche
+   `portal_sync: refreshed file (id=…)` sans erreur.
+
+**Déjà en place (ne rien refaire) :** secrets pipeline (MOTHERDUCK/CDSAPI/R2_*)
+dans l'environnement `Secret` ; job lié via `environment: Secret` ; agriculture
+retirée du workflow ; portail déployé avec build vert (dernier deploy `f9e08eb`).
+Les anciens secrets `PORTAL_SYNC_URL` / `ADMIN_SYNC_SECRET` ne servent plus.
+
+**Ne PAS refaire :** ne pas tenter de réparer `/api/admin/sync` côté Vercel
+(hyparquet non-bundlable dans le runtime serverless — abandonné volontairement).
+La conversion parquet→XLSX + l'enregistrement se font désormais **dans le
+pipeline** (`include/pipeline/portal_sync.py`).
+
 ## Airflow / Docker
 - Scheduler container: `data-platform-climat_d199a1-scheduler-1`
 - Trigger DAG: `docker exec <scheduler> airflow dags trigger era5_in_taskflow`
