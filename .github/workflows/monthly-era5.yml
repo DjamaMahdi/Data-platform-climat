@@ -1,12 +1,13 @@
 name: Monthly ERA5 pipeline
 
-# Runs the General ERA5 -> MotherDuck -> dbt -> R2 pipeline once a month, then
-# triggers the Vercel portal to ingest the refreshed gold parquet files.
+# Runs the General ERA5 -> MotherDuck -> dbt -> R2 pipeline once a month. The
+# runner then converts the gold parquet to XLSX in R2 and upserts the portal's
+# Supabase datasets (include/pipeline/portal_sync.py), preserving any admin
+# edits. Finally it pings a Vercel deploy hook so the live app redeploys.
 #
 # The Agriculture pipeline is intentionally NOT run here: it is slow (5 CDS
-# variables + a ~600k-row mart rebuild) and the portal sync excludes it anyway
-# (its parquet->XLSX conversion exceeds the Vercel Hobby 60s limit). Run it
-# manually when needed: `python scripts/run_pipeline.py --target agriculture`.
+# variables + a ~600k-row mart rebuild) and is not published on the portal. Run
+# it manually when needed: `python scripts/run_pipeline.py --target agriculture`.
 #
 # The 6th of each month at 03:00 UTC is safely past the ERA5 monthly-means
 # 2-month publication lag.
@@ -35,6 +36,9 @@ jobs:
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,13 +52,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-ci.txt
 
-      - name: Run ERA5 pipeline (General only)
+      - name: Run ERA5 pipeline (General only) + refresh portal datasets
         run: python scripts/run_pipeline.py --target general
 
-      - name: Trigger portal sync
-        env:
-          PORTAL_SYNC_URL: ${{ secrets.PORTAL_SYNC_URL }}
-          ADMIN_SYNC_SECRET: ${{ secrets.ADMIN_SYNC_SECRET }}
-        run: |
-          curl -fsS -X POST "$PORTAL_SYNC_URL" \
-            -H "x-admin-secret: $ADMIN_SYNC_SECRET"
+      - name: Redeploy Vercel app
+        if: ${{ env.VERCEL_DEPLOY_HOOK != '' }}
+        run: curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"

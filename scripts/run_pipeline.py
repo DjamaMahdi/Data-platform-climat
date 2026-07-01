@@ -27,7 +27,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 os.chdir(REPO_ROOT)
 
-from include.pipeline import agriculture_pipeline, general_pipeline, regions  # noqa: E402
+from include.pipeline import agriculture_pipeline, general_pipeline, portal_sync, regions  # noqa: E402
 
 DBT_PROJECT_DIR = "include/dbt"
 
@@ -70,6 +70,9 @@ def run_general():
     general_pipeline.ingest()
     run_dbt(["run", "--select", *DBT_SELECTORS["general"]])
     general_pipeline.export()
+    # Refresh the portal datasets (parquet -> XLSX in R2 + Supabase upsert),
+    # preserving any admin edits. No-op if Supabase env vars are absent.
+    portal_sync.register()
 
 
 def run_agriculture():
