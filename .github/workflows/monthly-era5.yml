@@ -1,21 +1,20 @@
 name: Monthly ERA5 pipeline
 
-# Runs the ERA5 -> MotherDuck -> dbt -> R2 pipeline once a month, then triggers
-# the Vercel portal to ingest the refreshed gold parquet files.
+# Runs the General ERA5 -> MotherDuck -> dbt -> R2 pipeline once a month, then
+# triggers the Vercel portal to ingest the refreshed gold parquet files.
+#
+# The Agriculture pipeline is intentionally NOT run here: it is slow (5 CDS
+# variables + a ~600k-row mart rebuild) and the portal sync excludes it anyway
+# (its parquet->XLSX conversion exceeds the Vercel Hobby 60s limit). Run it
+# manually when needed: `python scripts/run_pipeline.py --target agriculture`.
 #
 # The 6th of each month at 03:00 UTC is safely past the ERA5 monthly-means
-# 2-month publication lag and the agrometeorological 15-day lag.
+# 2-month publication lag.
 
 on:
   schedule:
     - cron: "0 3 6 * *"
   workflow_dispatch:
-    inputs:
-      target:
-        description: "Which pipeline(s) to run"
-        type: choice
-        default: all
-        options: [all, general, agriculture]
 
 permissions:
   contents: read
@@ -49,8 +48,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-ci.txt
 
-      - name: Run ERA5 pipeline
-        run: python scripts/run_pipeline.py --target "${{ github.event.inputs.target || 'all' }}"
+      - name: Run ERA5 pipeline (General only)
+        run: python scripts/run_pipeline.py --target general
 
       - name: Trigger portal sync
         env:
