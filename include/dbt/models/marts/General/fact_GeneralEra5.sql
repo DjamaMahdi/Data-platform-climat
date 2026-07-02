@@ -2,8 +2,6 @@
 
 SELECT
     key_id,
-    datetime as Date,
-    year As "Année",
     month_year as "Mois_Années",
     latitude,
     longitude,
