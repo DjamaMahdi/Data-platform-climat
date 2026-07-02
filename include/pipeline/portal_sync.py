@@ -133,7 +133,8 @@ def register():
         selection = ", ".join(f'"{name}"' for name, _ in cols)
 
         # Always regenerate the XLSX from the freshest parquet (final gold table).
-        con.execute(f"COPY (SELECT {selection} FROM '{src}') TO '{dst}' WITH (FORMAT xlsx)")
+        # HEADER true is required: DuckDB's xlsx writer omits column names by default.
+        con.execute(f"COPY (SELECT {selection} FROM '{src}') TO '{dst}' WITH (FORMAT xlsx, HEADER true)")
         size = con.execute(f"SELECT octet_length(content) FROM read_blob('{dst}')").fetchone()[0]
         print(f"  parquet -> xlsx in R2 ({size / 1024 / 1024:.1f} MB)")
 
