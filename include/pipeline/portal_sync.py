@@ -49,6 +49,8 @@ DATASETS = [
     {
         "parquet": "Copernicus/General/GeneralEra5.parquet",
         "xlsx": "Copernicus/General/GeneralEra5.xlsx",
+        # Excluded from the XLSX only — the gold parquet keeps these columns.
+        "strip": {"date", "année"},
         "name": "ERA5 - Données climatiques mensuelles - Djibouti",
         "description": (
             "Données de réanalyse climatique ERA5 (ECMWF) — extraction mensuelle pour Djibouti. "
@@ -128,8 +130,9 @@ def register():
         src = f"s3://{bucket}/{d['parquet']}"
         dst = f"s3://{bucket}/{d['xlsx']}"
 
+        strip = STRIP_COLUMNS | d.get("strip", set())
         describe = con.execute(f"DESCRIBE SELECT * FROM '{src}'").fetchall()
-        cols = [(r[0], r[1]) for r in describe if r[0].lower() not in STRIP_COLUMNS]
+        cols = [(r[0], r[1]) for r in describe if r[0].lower() not in strip]
         selection = ", ".join(f'"{name}"' for name, _ in cols)
 
         # Always regenerate the XLSX from the freshest parquet (final gold table).
