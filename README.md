@@ -1,45 +1,112 @@
-Overview
-========
+# Data Platform Climat — Djibouti Climate Data Pipeline
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+An automated data platform that collects **ERA5 climate reanalysis data** for Djibouti from the [Copernicus Climate Data Store (CDS)](https://cds.climate.copernicus.eu/), transforms it through a medallion architecture (Bronze → Silver → Gold) in **MotherDuck**, and publishes analysis-ready datasets to **Cloudflare R2** and the [FAO climate data portal](https://data-climat.vercel.app).
 
-Project Contents
-================
+## Architecture
 
-Your Astro project contains the following files and folders:
+```
+Copernicus CDS API (ERA5)
+        │  monthly download (NetCDF)
+        ▼
+MotherDuck — Bronze (raw tables)
+        │  dbt transformations
+        ▼
+MotherDuck — Silver (staging views) → Gold (fact tables)
+        │  DuckDB COPY (Parquet, ZSTD)
+        ▼
+Cloudflare R2 (Parquet + XLSX)
+        │  Supabase registration
+        ▼
+Data portal (data-climat.vercel.app)
+```
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+The whole flow is streamed in memory — NetCDF → xarray → pandas → DuckDB → R2 — with no intermediate CSV or temp files.
 
-Deploy Your Project Locally
-===========================
+## Pipelines
 
-Start Airflow on your local machine by running 'astro dev start'.
+| Pipeline | Data | Frequency | Resolution |
+|---|---|---|---|
+| **General ERA5** | Temperature, precipitation, wind, radiation, evaporation, pressure, sea surface temperature, waves | Monthly means, 1940 → present | 0.25° grid (56 points) |
+| **Agriculture ERA5** | 2m temperature (min/mean/max), wind, humidity, precipitation flux, reference evapotranspiration | Daily, 2021 → present | 0.1° grid (324 points) |
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+Both pipelines map grid points to Djibouti's **6 administrative regions** (GADM Level 1) via a DuckDB spatial join, so climate indicators can be analyzed per region.
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+## How it works — step by step
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+1. **Incremental ingestion** — the pipeline queries MotherDuck for the latest loaded month, computes the missing months up to the ERA5 publication cutoff (today − 2 months), and downloads only what's missing from the CDS API in batched, cartesian-safe requests. An empty table triggers a full historical load.
+2. **Bronze load** — NetCDF files are read with xarray and inserted directly into MotherDuck Bronze tables (`General1`, `General2`, `General3`, `Ag_*`). GADM region polygons are loaded from GeoJSON with DuckDB's `spatial` extension.
+3. **dbt transformations** — staging views (Silver) clean and key the raw data (unit conversions, surrogate keys); intermediate models join variables, dates, and regions; mart tables (Gold) produce `fact_GeneralEra5`, `fact_AgricultureEra5`, and `dim_vagues`.
+4. **Export to R2** — DuckDB's `httpfs` extension streams the Gold tables straight from MotherDuck to Cloudflare R2 as ZSTD-compressed Parquet (`COPY ... TO 's3://medd/...'`).
+5. **Portal sync** — `portal_sync.py` converts the Parquet exports to XLSX on R2 and upserts the dataset records in the portal's Supabase database, preserving any edits made by admins in the portal UI.
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+## Running the pipeline
 
-Deploy Your Project to Astronomer
-=================================
+### Option A — GitHub Actions (production)
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+The workflow [`.github/workflows/monthly-era5.yml`](.github/workflows/monthly-era5.yml) runs the General pipeline monthly (cron `0 3 6 * *`) and can be triggered manually from the Actions tab. Secrets are stored in the repository **Environment `Secret`**.
 
-Contact
-=======
+### Option B — CLI
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+```bash
+python scripts/run_pipeline.py --target general      # General ERA5 only
+python scripts/run_pipeline.py --target agriculture  # Agriculture only
+python scripts/run_pipeline.py --target all
+```
+
+Each target runs: load regions → ingest → `dbt run` → export → portal sync.
+
+### Option C — Airflow (local, via Astronomer)
+
+```bash
+astro dev start
+```
+
+DAGs: `era5_in_taskflow` (General, monthly) and `agri_era5_in_taskflow` (Agriculture). Both are thin wrappers around the shared modules in `include/pipeline/`.
+
+## Configuration
+
+Required environment variables / secrets:
+
+| Variable | Purpose |
+|---|---|
+| `MOTHERDUCK_TOKEN` | MotherDuck database access |
+| `CDSAPI_KEY` | Copernicus CDS API key |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | Cloudflare R2 export |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Portal dataset registration |
+| `VERCEL_DEPLOY_HOOK` *(optional)* | Redeploy the portal after sync |
+
+## Project structure
+
+```
+├── dags/                        # Airflow DAGs (thin wrappers)
+│   ├── General_Era5.py
+│   └── Agriculture_Era5.py
+├── include/
+│   ├── pipeline/                # Shared pipeline logic (no Airflow deps)
+│   │   ├── general_pipeline.py  # ingest + export (General ERA5)
+│   │   ├── agriculture_pipeline.py
+│   │   ├── regions.py           # GADM region loading
+│   │   └── portal_sync.py       # Parquet → XLSX + Supabase upsert
+│   ├── dbt/                     # dbt project (staging / intermediate / marts)
+│   └── dataset/                 # GADM GeoJSON reference data
+├── scripts/
+│   └── run_pipeline.py          # CLI runner (used by CI)
+├── .github/workflows/
+│   └── monthly-era5.yml         # Monthly production run
+├── Dockerfile                   # Astro Runtime image
+└── requirements.txt
+```
+
+## Tech stack
+
+- **Orchestration:** GitHub Actions (production) · Apache Airflow / Astronomer (local)
+- **Storage & compute:** MotherDuck (DuckDB cloud), Cloudflare R2
+- **Transformation:** dbt (duckdb adapter), DuckDB `spatial` + `httpfs` extensions
+- **Ingestion:** CDS API (`cdsapi`), xarray, pandas
+- **Portal:** Next.js on Vercel, Supabase (PostgREST)
+
+## Data quality notes
+
+- ERA5 monthly means publish with a ~2-month lag (`ERA5_LAG_MONTHS = 2`); the pipeline never requests restricted ERA5T monthly data.
+- Ingestion is idempotent: already-loaded months are skipped, so re-runs never create duplicates.
+- Temperatures were cross-validated against published climate references (Weather Spark, climate-data.org, World Bank) — see `CLAUDE.md` for details.
