@@ -1,7 +1,7 @@
 """Refresh the institutional ERA5 datasets on the MEDD portal after an export.
 
-Runs at the end of the General pipeline: converts the final gold parquet in R2
-to XLSX (also in R2) and upserts the dataset rows in the portal's Supabase.
+Runs at the end of each pipeline: converts the final gold parquet in R2 to XLSX
+(also in R2) and upserts the dataset rows in the portal's Supabase.
 
 IMPORTANT — the admin's platform-side edits are preserved: dataset name,
 description and per-column metadata are written ONLY on first insert. On every
@@ -10,6 +10,10 @@ XLSX itself is re-generated from the latest parquet); the editable fields are
 never touched. This is the portal-side equivalent of the previous
 `/api/admin/sync` endpoint, moved into the pipeline so it no longer depends on
 the (fragile) Vercel serverless runtime.
+
+Each entry carries a `group` matching a `run_pipeline.py --target` value, so
+`register("general")` only touches the General datasets and
+`register("agriculture")` only the Agriculture one.
 
 Requires env vars: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY,
 R2_BUCKET_NAME, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY. If the Supabase vars
@@ -21,6 +25,7 @@ import duckdb
 import requests
 
 # Well-known ERA5 column metadata (French) — mirrors the portal's ERA5_COLUMN_INFO.
+# Keys are compared lowercased.
 COLINFO = {
     "time": ("Date de la mesure", ""), "date": ("Date de la mesure", ""),
     "valid_time": ("Date et heure de validité", ""), "number": ("Numéro d'ensemble", ""),
@@ -41,12 +46,27 @@ COLINFO = {
     "mwd": ("Direction moyenne des vagues", "°"), "mwp": ("Période moyenne des vagues", "s"),
     "direction_moyenne_vagues": ("Direction moyenne des vagues", "°"),
     "periode_moyenne_vagues": ("Période moyenne des vagues", "s"),
+    # ── Agriculture gold table (fact_AgricultureEra5) ──
+    "années": ("Année de la mesure", ""),
+    "mois_années": ("Mois et année de la mesure", ""),
+    "region": ("Région administrative (GADM niveau 1)", ""),
+    "temp_max_24h": ("Température maximale de l'air à 2 m sur 24 h", "°C"),
+    "temp_moyenne_24h": ("Température moyenne de l'air à 2 m sur 24 h", "°C"),
+    "temp_min_24h": ("Température minimale de l'air à 2 m sur 24 h", "°C"),
+    "vitesse_vent_10m_moyenne": ("Vitesse moyenne du vent à 10 m sur 24 h", "m/s"),
+    "reference_evapotranspiration": ("Évapotranspiration de référence (Penman-Monteith FAO-56)", "mm/jour"),
+    "precipitation_flux": ("Flux de précipitations", "mm/jour"),
+    "humidité_relative": ("Humidité relative à 2 m (12h00 UTC)", "fraction 0-1"),
+    "coord_id": ("Identifiant de coordonnée", ""),
 }
 STRIP_COLUMNS = {"key_id"}
-THEME_SLUG = "meteorologie_climat"
+
+# Hard limit of the XLSX format (1 048 576 rows including the header row).
+XLSX_MAX_ROWS = 1_048_576
 
 DATASETS = [
     {
+        "group": "general",
         "parquet": "Copernicus/General/GeneralEra5.parquet",
         "xlsx": "Copernicus/General/GeneralEra5.xlsx",
         "name": "ERA5 - Données climatiques mensuelles - Djibouti",
@@ -56,9 +76,11 @@ DATASETS = [
             "précipitations, vent, pression, rayonnement solaire, humidité."
         ),
         "source": "Copernicus Climate Change Service (ECMWF) — ERA5",
+        "theme_slug": "meteorologie_climat",
         "tags": ["ERA5", "climat", "mensuel", "Djibouti", "réanalyse", "ECMWF"],
     },
     {
+        "group": "general",
         "parquet": "Copernicus/General/vagues.parquet",
         "xlsx": "Copernicus/General/vagues.xlsx",
         "name": "ERA5 - Données de vagues océaniques - Djibouti",
@@ -67,9 +89,32 @@ DATASETS = [
             "Inclut la direction moyenne et la période moyenne des vagues."
         ),
         "source": "Copernicus Climate Change Service (ECMWF) — ERA5",
+        "theme_slug": "meteorologie_climat",
         "tags": ["ERA5", "vagues", "océanographie", "houle", "Djibouti", "réanalyse", "ECMWF"],
     },
+    {
+        "group": "agriculture",
+        "parquet": "Copernicus/Agriculture/AgricultureEra5.parquet",
+        "xlsx": "Copernicus/Agriculture/AgricultureEra5.xlsx",
+        "name": "ERA5 - Indicateurs agrométéorologiques journaliers - Djibouti",
+        "description": (
+            "Indicateurs agrométéorologiques journaliers dérivés de la réanalyse ERA5 "
+            "(Copernicus C3S / AgERA5), depuis 2021 pour Djibouti, sur une grille de 0,1° "
+            "(324 points) rattachée aux 6 régions administratives. Variables : températures "
+            "de l'air à 2 m (maximale, moyenne, minimale sur 24 h), vitesse moyenne du vent "
+            "à 10 m, humidité relative à 12h00, flux de précipitations et évapotranspiration "
+            "de référence (Penman-Monteith FAO-56)."
+        ),
+        "source": "Copernicus Climate Change Service (ECMWF) — AgERA5 / ERA5",
+        "theme_slug": "agriculture_securite_alimentaire",
+        "tags": [
+            "ERA5", "AgERA5", "agrométéorologie", "journalier", "Djibouti",
+            "agriculture", "évapotranspiration", "réanalyse", "ECMWF",
+        ],
+    },
 ]
+
+GROUPS = sorted({d["group"] for d in DATASETS})
 
 
 def _map_type(duck_type):
@@ -93,8 +138,33 @@ def _connect_r2():
     return con
 
 
-def register():
-    """Convert the gold parquet(s) to XLSX in R2 and upsert the portal datasets."""
+def _fetch_theme_ids(base_url, headers, slugs):
+    """Resolve the portal theme slugs used by the selected datasets to their ids."""
+    resp = requests.get(
+        f"{base_url}/rest/v1/themes",
+        headers=headers,
+        params={"slug": f"in.({','.join(sorted(slugs))})", "select": "id,slug"},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return {row["slug"]: row["id"] for row in resp.json()}
+
+
+def _select_datasets(group):
+    if group is None:
+        return list(DATASETS)
+    if group not in GROUPS:
+        raise ValueError(f"portal_sync: unknown group '{group}' (known: {', '.join(GROUPS)})")
+    return [d for d in DATASETS if d["group"] == group]
+
+
+def register(group=None):
+    """Convert the gold parquet(s) to XLSX in R2 and upsert the portal datasets.
+
+    group: "general", "agriculture", or None for every configured dataset.
+    """
+    datasets = _select_datasets(group)
+
     supabase_url = os.getenv("SUPABASE_URL")
     service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     if not supabase_url or not service_key:
@@ -110,20 +180,14 @@ def register():
     bucket = os.environ["R2_BUCKET_NAME"]
     con = _connect_r2()
 
-    resp = requests.get(
-        f"{supabase_url}/rest/v1/themes",
-        headers=headers,
-        params={"slug": f"eq.{THEME_SLUG}", "select": "id"},
-        timeout=30,
-    )
-    resp.raise_for_status()
-    rows = resp.json()
-    if not rows:
-        print(f"portal_sync: theme '{THEME_SLUG}' not found in Supabase — skipping")
-        return
-    theme_id = rows[0]["id"]
+    theme_ids = _fetch_theme_ids(supabase_url, headers, {d["theme_slug"] for d in datasets})
 
-    for d in DATASETS:
+    for d in datasets:
+        theme_id = theme_ids.get(d["theme_slug"])
+        if theme_id is None:
+            print(f"portal_sync: theme '{d['theme_slug']}' not found in Supabase — skipping {d['name']}")
+            continue
+
         print(f"portal_sync: {d['name']}")
         src = f"s3://{bucket}/{d['parquet']}"
         dst = f"s3://{bucket}/{d['xlsx']}"
@@ -132,11 +196,21 @@ def register():
         cols = [(r[0], r[1]) for r in describe if r[0].lower() not in STRIP_COLUMNS]
         selection = ", ".join(f'"{name}"' for name, _ in cols)
 
+        # Fail loudly rather than publish a truncated workbook. The daily Agriculture
+        # table grows ~118k rows/year and will eventually reach this ceiling.
+        row_count = con.execute(f"SELECT count(*) FROM '{src}'").fetchone()[0]
+        if row_count + 1 > XLSX_MAX_ROWS:
+            raise RuntimeError(
+                f"portal_sync: {d['parquet']} has {row_count:,} rows — exceeds the XLSX limit of "
+                f"{XLSX_MAX_ROWS:,} (header included). Publish it as CSV/Parquet instead, or split "
+                f"it, before this dataset can be refreshed again."
+            )
+
         # Always regenerate the XLSX from the freshest parquet (final gold table).
         # HEADER true is required: DuckDB's xlsx writer omits column names by default.
         con.execute(f"COPY (SELECT {selection} FROM '{src}') TO '{dst}' WITH (FORMAT xlsx, HEADER true)")
         size = con.execute(f"SELECT octet_length(content) FROM read_blob('{dst}')").fetchone()[0]
-        print(f"  parquet -> xlsx in R2 ({size / 1024 / 1024:.1f} MB)")
+        print(f"  parquet -> xlsx in R2 ({row_count:,} rows, {size / 1024 / 1024:.1f} MB)")
 
         file_path = f"r2:{d['xlsx']}"
         existing = requests.get(

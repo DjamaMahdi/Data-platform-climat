@@ -1,0 +1,69 @@
+name: Daily ERA5 (Agriculture) pipeline
+
+# Runs the Agriculture ERA5 -> MotherDuck -> dbt -> R2 pipeline every 5 days.
+# This is the "daily data" pipeline: the CDS dataset
+# `sis-agrometeorological-indicators` publishes DAILY agrometeorological
+# indicators (AgERA5) with a ~15-day lag, so a 5-day cadence keeps the portal
+# close to the publication front without hammering the CDS queue.
+#
+# Ingestion is incremental and append-only: each run re-downloads only the
+# current partial month (which it deletes first) plus any month still missing,
+# so repeating it every 5 days is cheap and idempotent.
+#
+# Like the General/monthly workflow, the last step converts the gold parquet to
+# XLSX in R2 and upserts the portal's Supabase dataset row
+# (include/pipeline/portal_sync.py, group "agriculture"), preserving any admin
+# edits, then pings the Vercel deploy hook.
+#
+# NOTE on `*/5` in the day-of-month field: cron restarts the step counter each
+# month, so this fires on days 1, 6, 11, 16, 21 and 26 — i.e. every 5 days,
+# with a 4-6 day gap across the month boundary. The 06:00 UTC slot sits after
+# the monthly General run (03:00 on the 6th); both workflows also share one
+# concurrency group so they never hit the CDS API at the same time.
+
+on:
+  schedule:
+    - cron: "0 6 */5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: era5-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    environment: Secret
+    timeout-minutes: 350
+    env:
+      MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+      CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-ci.txt
+
+      - name: Run ERA5 pipeline (Agriculture / daily) + refresh portal dataset
+        run: python scripts/run_pipeline.py --target agriculture
+
+      - name: Redeploy Vercel app
+        if: ${{ env.VERCEL_DEPLOY_HOOK != '' }}
+        run: curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"

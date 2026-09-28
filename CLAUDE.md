@@ -307,8 +307,8 @@ DAG reduced from 14 to 5 variables:
 
 ### Pending work
 - [ ] Consider materializing Silver as tables (not views) — millions of rows per staging model
-- [ ] Add R2 export task for the agriculture fact table
-- [ ] Uncomment export task in Agriculture DAG chain
+- [x] Add R2 export task for the agriculture fact table — `agriculture_pipeline.export()`
+- [x] Uncomment export task in Agriculture DAG chain — `export_to_R2()` is in the chain
 - [ ] Add remaining 9 agro variables back to DAG when CDS quota allows
 - [ ] Create dbt sources YAML for Agriculture Bronze tables
 
@@ -335,10 +335,19 @@ Per target: `load_regions()` → `ingest()` → `dbt run` (direct, no cosmos:
 `--project-dir include/dbt --profiles-dir include/dbt --select path:models/staging/<X> path:models/marts/<X>`)
 → `export()`. It `os.chdir`s to the repo root so relative paths resolve.
 
-**Workflow:** `.github/workflows/monthly-era5.yml` — cron `0 3 6 * *` +
-`workflow_dispatch`. Runs `--target general` only (Agriculture excluded).
-Secrets live in the GitHub **Environment named `Secret`** (not repo secrets), so
-the job declares `environment: Secret`.
+**Workflows** — both declare `environment: Secret` (the secrets live in the
+GitHub **Environment named `Secret`**, not repo secrets) and share the
+`era5-pipeline` concurrency group, so they never hit the CDS API at once:
+- `.github/workflows/monthly-era5.yml` — cron `0 3 6 * *` + `workflow_dispatch`,
+  runs `--target general`.
+- `.github/workflows/daily-era5.yml` — cron `0 6 */5 * *` + `workflow_dispatch`,
+  runs `--target agriculture`: the **daily** AgERA5 indicators, re-enabled
+  2026-09-28 after having been dropped from the monthly workflow in `f83c402`.
+  `*/5` in the day-of-month field restarts each month, so it fires on days
+  1, 6, 11, 16, 21 and 26 — every 5 days, with a 4-6 day gap at the month
+  boundary. Ingestion is incremental and append-only (it deletes and
+  re-downloads only the current partial month), so a 5-day cadence is cheap
+  and idempotent; AgERA5 publishes with a ~15-day lag (`AGRO_LAG_DAYS = 15`).
 
 **Portal refresh moved into the pipeline (2026-07-01).** The old design
 `curl`ed the portal's `POST /api/admin/sync`, which converted parquet→XLSX in
@@ -355,7 +364,15 @@ broke the build). So the conversion + registration now runs **in the pipeline**:
   **Preserves admin edits**: existing rows only get `file_size_bytes` refreshed;
   `name`/`description`/`columns` (edited in the portal UI) are never overwritten.
   Matches rows by `file_path = r2:<xlsxKey>`. No-op if Supabase env vars absent.
-- `run_pipeline.py` `run_general()` calls `portal_sync.register()` after export.
+- `register(group)` selects which entries to refresh: `run_general()` calls
+  `portal_sync.register("general")` and `run_agriculture()` calls
+  `portal_sync.register("agriculture")`, both right after `export()`. Passing no
+  group refreshes all of them. An unknown group raises `ValueError`.
+- Before writing, it counts the parquet rows and **raises** if the result would
+  exceed the XLSX ceiling of 1 048 576 rows (header included) rather than
+  publishing a truncated workbook. Agriculture is at ~452k rows and grows
+  ~83k/year (226 land grid points x 365 days), so it has roughly 7 years of
+  headroom; after that it must move to CSV/Parquet or be split.
 - The workflow then pings an **optional Vercel deploy hook** (`VERCEL_DEPLOY_HOOK`)
   to redeploy the live app. The data is already live via Supabase, so the
   redeploy is cosmetic.
@@ -369,12 +386,45 @@ The portal's `/api/admin/sync` endpoint still exists but is no longer used.
 the portal's `frontend/.env.local`), and optionally `VERCEL_DEPLOY_HOOK`
 (Vercel → project `Data-Climat` → Settings → Git → Deploy Hooks).
 
-**Portal dataset config** (kept in sync with the portal's
-`syncInstitutionalDatasets.ts`): 2 datasets, theme `meteorologie_climat` (id 6),
-source "Copernicus Climate Change Service (ECMWF) — ERA5":
-`Copernicus/General/GeneralEra5.parquet` → *ERA5 - Données climatiques mensuelles
-- Djibouti*, `Copernicus/General/vagues.parquet` → *ERA5 - Données de vagues
-océaniques - Djibouti*. Both currently live on the portal (dataset ids 10 & 11).
+**Portal dataset config** — 3 datasets, all live on the portal:
+
+| group | parquet | portal dataset | theme (id) | portal id |
+|---|---|---|---|---|
+| `general` | `Copernicus/General/GeneralEra5.parquet` | *ERA5 - Données climatiques mensuelles - Djibouti* | `meteorologie_climat` (6) | 10 |
+| `general` | `Copernicus/General/vagues.parquet` | *ERA5 - Données de vagues océaniques - Djibouti* | `meteorologie_climat` (6) | 11 |
+| `agriculture` | `Copernicus/Agriculture/AgricultureEra5.parquet` | *ERA5 - Indicateurs agrométéorologiques journaliers - Djibouti* | `agriculture_securite_alimentaire` (9) | 94 |
+
+Sources: "Copernicus Climate Change Service (ECMWF) — ERA5" for the General
+pair, "… — AgERA5 / ERA5" for Agriculture. The theme slug is per-dataset
+(`theme_slug`), resolved to an id in one `themes` request per run.
+
+⚠️ The portal's `syncInstitutionalDatasets.ts` still lists only the 2 General
+datasets. That is deliberate — the endpoint it backs (`/api/admin/sync`) is
+dead on Vercel (hyparquet is not bundlable) and is no longer used by anything.
+`portal_sync.py` is the single source of truth.
+
+### ✅ Pipeline journalier (Agriculture / AgERA5) rétabli — 2026-09-28
+
+Le pipeline **journalier** avait été retiré du workflow le 2026-06-30 (commit
+`f83c402`, « run only General ERA5 in the monthly workflow; drop Agriculture »).
+Il est de nouveau automatisé :
+
+- **`.github/workflows/daily-era5.yml`** — cron `0 6 */5 * *` (**tous les 5 jours** :
+  1, 6, 11, 16, 21, 26 à 06:00 UTC) + `workflow_dispatch`. Lance
+  `run_pipeline.py --target agriculture`, puis le deploy hook Vercel.
+- **`portal_sync.register("agriculture")`** est appelé à la fin de
+  `run_agriculture()`, exactement comme `register("general")` l'est pour le
+  mensuel : parquet → XLSX dans R2 → upsert Supabase, éditions admin préservées.
+- Le dataset est **déjà en ligne** sur le portail : **id 94**, thème
+  *Agriculture et sécurité alimentaire* (9), 452 000 lignes, XLSX ~26 MB
+  (publié à la main depuis le poste local, comme l'avaient été les ids 10 & 11).
+- Les deux workflows partagent le groupe de concurrence `era5-pipeline` : ils ne
+  peuvent donc pas interroger l'API CDS en même temps.
+
+**Rien à configurer** : les secrets de l'environnement `Secret` sont les mêmes
+que ceux du workflow mensuel. Première exécution planifiée : le 1er du mois
+suivant à 06:00 UTC — ou immédiatement via Actions → *Daily ERA5 (Agriculture)
+pipeline* → **Run workflow**.
 
 ### ⏳ REPRENDRE ICI (handoff 2026-07-01)
 

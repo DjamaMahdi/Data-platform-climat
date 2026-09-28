@@ -5,9 +5,9 @@ name: Monthly ERA5 pipeline
 # Supabase datasets (include/pipeline/portal_sync.py), preserving any admin
 # edits. Finally it pings a Vercel deploy hook so the live app redeploys.
 #
-# The Agriculture pipeline is intentionally NOT run here: it is slow (5 CDS
-# variables + a ~600k-row mart rebuild) and is not published on the portal. Run
-# it manually when needed: `python scripts/run_pipeline.py --target agriculture`.
+# The Agriculture (daily AgERA5) pipeline is NOT run here — it has its own
+# workflow on a 5-day cadence: `.github/workflows/daily-era5.yml`. Both share
+# the `era5-pipeline` concurrency group so they never hit the CDS API at once.
 #
 # The 6th of each month at 03:00 UTC is safely past the ERA5 monthly-means
 # 2-month publication lag.
@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: monthly-era5
+  group: era5-pipeline
   cancel-in-progress: false
 
 jobs:

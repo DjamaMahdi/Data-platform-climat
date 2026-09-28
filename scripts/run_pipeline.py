@@ -72,7 +72,7 @@ def run_general():
     general_pipeline.export()
     # Refresh the portal datasets (parquet -> XLSX in R2 + Supabase upsert),
     # preserving any admin edits. No-op if Supabase env vars are absent.
-    portal_sync.register()
+    portal_sync.register("general")
 
 
 def run_agriculture():
@@ -81,6 +81,9 @@ def run_agriculture():
     agriculture_pipeline.ingest(raise_on_failure=True)
     run_dbt(["run", "--select", *DBT_SELECTORS["agriculture"]])
     agriculture_pipeline.export()
+    # Same portal refresh as the General target — publishes/updates the daily
+    # agrometeorological dataset on the MEDD portal, preserving admin edits.
+    portal_sync.register("agriculture")
 
 
 def main():

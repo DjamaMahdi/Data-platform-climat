@@ -37,13 +37,20 @@ Both pipelines map grid points to Djibouti's **6 administrative regions** (GADM 
 2. **Bronze load** — NetCDF files are read with xarray and inserted directly into MotherDuck Bronze tables (`General1`, `General2`, `General3`, `Ag_*`). GADM region polygons are loaded from GeoJSON with DuckDB's `spatial` extension.
 3. **dbt transformations** — staging views (Silver) clean and key the raw data (unit conversions, surrogate keys); intermediate models join variables, dates, and regions; mart tables (Gold) produce `fact_GeneralEra5`, `fact_AgricultureEra5`, and `dim_vagues`.
 4. **Export to R2** — DuckDB's `httpfs` extension streams the Gold tables straight from MotherDuck to Cloudflare R2 as ZSTD-compressed Parquet (`COPY ... TO 's3://medd/...'`).
-5. **Portal sync** — `portal_sync.py` converts the Parquet exports to XLSX on R2 and upserts the dataset records in the portal's Supabase database, preserving any edits made by admins in the portal UI.
+5. **Portal sync** — `portal_sync.py` converts the Parquet exports to XLSX on R2 and upserts the dataset records in the portal's Supabase database, preserving any edits made by admins in the portal UI. Each pipeline refreshes only its own datasets (`register("general")` / `register("agriculture")`).
 
 ## Running the pipeline
 
 ### Option A — GitHub Actions (production)
 
-The workflow [`.github/workflows/monthly-era5.yml`](.github/workflows/monthly-era5.yml) runs the General pipeline monthly (cron `0 3 6 * *`) and can be triggered manually from the Actions tab. Secrets are stored in the repository **Environment `Secret`**.
+Two scheduled workflows, both manually triggerable from the Actions tab. Secrets are stored in the repository **Environment `Secret`**, and both share the `era5-pipeline` concurrency group so they never call the CDS API simultaneously.
+
+| Workflow | Pipeline | Cron | Runs on |
+|---|---|---|---|
+| [`monthly-era5.yml`](.github/workflows/monthly-era5.yml) | General ERA5 (monthly means) | `0 3 6 * *` | the 6th of each month, 03:00 UTC |
+| [`daily-era5.yml`](.github/workflows/daily-era5.yml) | Agriculture ERA5 (daily AgERA5 indicators) | `0 6 */5 * *` | every 5 days — days 1, 6, 11, 16, 21, 26, at 06:00 UTC |
+
+The Agriculture cadence is 5 days because AgERA5 publishes daily data with a ~15-day lag, and ingestion is incremental and append-only (each run re-downloads only the current partial month), so repeating it often is cheap and idempotent.
 
 ### Option B — CLI
 
@@ -92,7 +99,8 @@ Required environment variables / secrets:
 ├── scripts/
 │   └── run_pipeline.py          # CLI runner (used by CI)
 ├── .github/workflows/
-│   └── monthly-era5.yml         # Monthly production run
+│   ├── monthly-era5.yml         # General ERA5 — monthly
+│   └── daily-era5.yml           # Agriculture ERA5 — every 5 days
 ├── Dockerfile                   # Astro Runtime image
 └── requirements.txt
 ```
