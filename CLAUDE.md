@@ -392,11 +392,18 @@ the portal's `frontend/.env.local`), and optionally `VERCEL_DEPLOY_HOOK`
 |---|---|---|---|---|
 | `general` | `Copernicus/General/GeneralEra5.parquet` | *ERA5 - Données climatiques mensuelles - Djibouti* | `meteorologie_climat` (6) | 10 |
 | `general` | `Copernicus/General/vagues.parquet` | *ERA5 - Données de vagues océaniques - Djibouti* | `meteorologie_climat` (6) | 11 |
-| `agriculture` | `Copernicus/Agriculture/AgricultureEra5.parquet` | *ERA5 - Indicateurs agrométéorologiques journaliers - Djibouti* | `agriculture_securite_alimentaire` (9) | 94 |
+| `agriculture` | `Copernicus/Agriculture/AgricultureEra5.parquet` | *ERA5 - Indicateurs agrométéorologiques journaliers - Djibouti* | `meteorologie_climat` (6) | 94 |
 
 Sources: "Copernicus Climate Change Service (ECMWF) — ERA5" for the General
 pair, "… — AgERA5 / ERA5" for Agriculture. The theme slug is per-dataset
-(`theme_slug`), resolved to an id in one `themes` request per run.
+(`theme_slug`), resolved to an id in one `themes` request per run. All three sit
+under **Météorologie et climat** — it is climate reanalysis; "agro" describes the
+indicators, not the theme (changed 2026-09-28, dataset 94 was briefly under
+`agriculture_securite_alimentaire`).
+
+⚠️ `theme_slug` only applies on **first insert**. Changing it here does NOT move an
+already-registered dataset — that row must be updated in the portal admin (or with
+a direct PATCH), exactly like name/description/columns.
 
 ⚠️ The portal's `syncInstitutionalDatasets.ts` still lists only the 2 General
 datasets. That is deliberate — the endpoint it backs (`/api/admin/sync`) is
@@ -416,8 +423,13 @@ Il est de nouveau automatisé :
   `run_agriculture()`, exactement comme `register("general")` l'est pour le
   mensuel : parquet → XLSX dans R2 → upsert Supabase, éditions admin préservées.
 - Le dataset est **déjà en ligne** sur le portail : **id 94**, thème
-  *Agriculture et sécurité alimentaire* (9), 452 000 lignes, XLSX ~26 MB
+  *Météorologie et climat* (6), 452 000 lignes, XLSX ~26 MB
   (publié à la main depuis le poste local, comme l'avaient été les ids 10 & 11).
+- Contenu vérifié : 2 000 jours (2021-01-01 → 2026-06-23) x 226 points de grille
+  terrestres = 452 000 lignes, 6 régions, aucune ligne sans région, aucun trou.
+  ⚠️ Le parquet ne contient donc **que les 226 points terrestres** — la note plus
+  haut qui annonce 324 points dont 98 océaniques avec `Region = NULL` ne reflète
+  plus le modèle actuel.
 - Les deux workflows partagent le groupe de concurrence `era5-pipeline` : ils ne
   peuvent donc pas interroger l'API CDS en même temps.
 

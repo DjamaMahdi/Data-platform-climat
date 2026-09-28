@@ -106,7 +106,9 @@ DATASETS = [
             "de référence (Penman-Monteith FAO-56)."
         ),
         "source": "Copernicus Climate Change Service (ECMWF) — AgERA5 / ERA5",
-        "theme_slug": "agriculture_securite_alimentaire",
+        # Same theme as the two General datasets: this is climate/weather
+        # reanalysis, the "agro" qualifier describes the indicators, not the theme.
+        "theme_slug": "meteorologie_climat",
         "tags": [
             "ERA5", "AgERA5", "agrométéorologie", "journalier", "Djibouti",
             "agriculture", "évapotranspiration", "réanalyse", "ECMWF",
