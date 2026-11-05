@@ -5,7 +5,7 @@ SELECT
     month_year as "Mois_Années",
     latitude,
     longitude,
-    Region,
+    -- Region,  -- column removed from the published files on request; the join in int_* stays because it limits the data to Djibouti
     total_precipitation,
     rayonnement_solaire_surface,
     evaporation_reelle,
